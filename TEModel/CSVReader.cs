@@ -30,7 +30,7 @@ namespace TEModel
                 List<float> y0_u = new List<float>();
                 List<float> yf_u = new List<float>();
 
-                string directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\Coordinatefile.csv";
+                string directory = @"C:\Users\James\Documents\GitHub\TEModel\Coordinatefile.csv";
 
                 TextReader dataRead = new StreamReader(directory);
 

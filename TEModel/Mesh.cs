@@ -204,7 +204,7 @@ namespace TEModel
 
                     foreach (Layer layer in Layer_List)
                     {
-                        if (upper_Left.X >= layer.Layer_x0 && lower_Right.X <= layer.Layer_xf && upper_Left.Y <= layer.Layer_y0 && lower_Right.Y >= layer.Layer_yf)
+                        if ((upper_Left.X >= layer.Layer_x0) && (lower_Right.X <= layer.Layer_xf) && (upper_Left.Y <= layer.Layer_y0) && (lower_Right.Y >= layer.Layer_yf))
                         {
                             material = layer.Layer_Material;
                         }                        
@@ -213,9 +213,37 @@ namespace TEModel
                     Node_Array[i, j] = new Node(X, Y, DY, DX, ID);
                     Node_Array[i, j].Material = material;
 
+                    
+
                     ID++;
                 }
             }
+
+            // Node Corrections
+            for (int i = 1; i < Coordinate_Array.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < Coordinate_Array.GetLength(1) - 1; j++)
+                {
+                    if (Node_Array[i, j].Material == "BiTe" && (Node_Array[i + 1, j].Material != "BiTe"))
+                    {
+                        Node_Array[i + 1, j].Material = "Air";
+                    }
+                    else if (Node_Array[i, j].Material == "BiTe" && (Node_Array[i - 1, j].Material != "BiTe"))
+                    {
+                        Node_Array[i - 1, j].Material = "Air";
+                    }
+
+                    if (Node_Array[i, j].Material == "Copper" && (Node_Array[i + 1, j].Material != "Copper"))
+                    {
+                        Node_Array[i + 1, j].Material = "Air";
+                    }
+                    else if (Node_Array[i, j].Material == "Copper" && (Node_Array[i - 1, j].Material != "Copper"))
+                    {
+                        Node_Array[i - 1, j].Material = "Air";
+                    }
+                }
+            }
+
 
             Console.WriteLine("Nodes Created:  " + ID);
         }

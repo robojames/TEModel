@@ -7,19 +7,19 @@ using System.IO;
 
 namespace TEModel
 {
-    class CSVReader
+    class CSVHandler
     {
+
+        string R_directory = @"C:\Users\Therm-MEC Lab\Documents\GitHub\TEModel\Coordinatefile.csv";
+        string W_directory = @"C:\Users\Therm-MEC Lab\Documents\GitHub\TEModel\Mesh.csv";
+
         public List<float> x;
         public List<float> y;
 
         public float[] x_Array;
         public float[] y_Array;
 
-        public CSVReader()
-        {
-            ReadFile();
-        }
-
+        
         public void ReadFile()
         {
 
@@ -30,9 +30,7 @@ namespace TEModel
                 List<float> y0_u = new List<float>();
                 List<float> yf_u = new List<float>();
 
-                string directory = @"C:\Users\James\Documents\GitHub\TEModel\Coordinatefile.csv";
-
-                TextReader dataRead = new StreamReader(directory);
+                TextReader dataRead = new StreamReader(R_directory);
 
                 List<string> Lines = new List<string>();
 
@@ -80,6 +78,58 @@ namespace TEModel
                 //Console.WriteLine("Final Size:    " + x.Count + "     " + y.Count);
 
                 dataRead.Close();
+            }
+            catch
+            {
+                Console.WriteLine("Error saving file, or writing was canceled ");
+            }
+        }
+
+        public void WriteMesh(Node[,] Nodes)
+        {
+            try
+            {
+                // 1 Copper
+                // 2 BiTe
+                // 3 Ceramic
+                // 4 Air
+
+                TextWriter dataWrite = new StreamWriter(W_directory);
+
+                List<string> Lines = new List<string>();
+
+                dataWrite.WriteLine("ID" + "," + "XPOS" + "," + "YPOS" + "," + "Material");
+
+                for (int i = 0; i < Nodes.GetLength(0); i++)
+                {
+                    for (int j = 0; j < Nodes.GetLength(1); j++)
+                    {
+                        int Mat_ID;
+
+                        switch (Nodes[i,j].Material)
+                        {
+                            case "Copper":
+                                Mat_ID = 1;
+                                break;
+                            case "BiTe":
+                                Mat_ID = 2;
+                                break;
+                            case "Ceramic":
+                                Mat_ID = 3;
+                                break;
+                            case "Air":
+                                Mat_ID = 4;
+                                break;
+                            default:
+                                Mat_ID = 0;
+                                break;
+                        }
+
+                        dataWrite.WriteLine(Nodes[i, j].ID + "," + Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + Mat_ID);
+                    }                    
+                }
+
+                dataWrite.Close();
             }
             catch
             {

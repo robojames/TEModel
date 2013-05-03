@@ -15,26 +15,176 @@ namespace TEModel
         List<Coordinate> CV_Coordinates;
         
         Coordinate[,] Coordinate_Array;
-        
+
+        public Node[,] Node_Array;
+
+        public List<Layer> Layer_List;
+        string material;
+
  
-        public Mesh(List<float> Initial_X, List<float> Initial_Y, int n_Divisions)
+        public Mesh(List<float> Initial_X, List<float> Initial_Y, int n_Divisions, List<Layer> Layer_List)
         {
+            this.Layer_List = Layer_List;
+
             Console.WriteLine("Generating Mesh Lines...");
             Generate_Lines(Initial_X, Initial_Y, n_Divisions);
 
             Console.WriteLine("Calculating Coordinate Pairs...");
             Generate_Coordinate_Pairs();
 
-            Console.WriteLine("Calculating Node Positions...");
+            Console.WriteLine("Calculating Node Positions, CV Widths/Heights, and Materials...");
             Generate_Nodes();
+
+            Console.WriteLine("Calculating delta_x's and delta_y's...");
+            Calculate_dX_dY();
 
         }
 
-        public void Generate_Nodes()
+
+
+        private void Calculate_dX_dY()
+        {
+            for (int i = 0; i < Node_Array.GetLength(0); i++)
+            {
+                for (int j = 0; j < Node_Array.GetLength(1); j++)
+                {
+                    if ((i == 0) && (j == 0))
+                    {
+                        float dXE = Node_Array[i + 1, j].x_Position - Node_Array[i, j].x_Position;
+                        float dYN = Node_Array[i, j + 1].y_Position - Node_Array[i, j].y_Position;
+                        float dXW = 0.0f;
+                        float dYS = 0.0f;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+                    }
+                    else if ((i == 0) && (j > 0) && (j != (Node_Array.GetLength(1) - 1)))
+                    {
+                        float dXE = Node_Array[i + 1, j].x_Position - Node_Array[i, j].x_Position;
+                        float dXW = 0.0f;
+                        float dYN = Node_Array[i, j + 1].y_Position - Node_Array[i, j].y_Position;
+                        float dYS = Node_Array[i, j].y_Position - Node_Array[i, j - 1].y_Position;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+                    }
+                    else if ((i > 0) && (j == 0) && (i != (Node_Array.GetLength(0) - 1)))
+                    {
+                        float dXE = Node_Array[i + 1, j].x_Position - Node_Array[i, j].x_Position;
+                        float dXW = Node_Array[i, j].x_Position - Node_Array[i - 1, j].x_Position;
+                        float dYN = Node_Array[i, j + 1].y_Position - Node_Array[i, j].y_Position;
+                        float dYS = 0.0f;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+                    }
+                    else if ((i == (Node_Array.GetLength(0) - 1)) && j == 0)
+                    {
+                        float dYN = Node_Array[i, j + 1].y_Position - Node_Array[i, j].y_Position;
+                        float dXW = Node_Array[i, j].x_Position - Node_Array[i - 1, j].x_Position;
+                        float dYS = 0.0f;
+                        float dXE = 0.0f;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+
+                    }
+                    else if ((j == (Node_Array.GetLength(1) - 1) && i == 0))
+                    {
+                        float dXE = Node_Array[i + 1, j].x_Position - Node_Array[i, j].x_Position;
+                        float dYS = Node_Array[i, j].y_Position - Node_Array[i, j - 1].y_Position;
+                        float dXW = 0.0f;
+                        float dYN = 0.0f;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+                    }
+                    else if ((j == (Node_Array.GetLength(1) - 1)) && (i == (Node_Array.GetLength(0) - 1)))
+                    {
+                        float dYS = Node_Array[i, j].y_Position - Node_Array[i, j - 1].y_Position;
+                        float dXW = Node_Array[i, j].x_Position - Node_Array[i - 1, j].x_Position;
+                        float dXE = 0.0f;
+                        float dYN = 0.0f;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+                    }
+                    else if (i > 0 && j > 0 && (i != (Node_Array.GetLength(0) - 1)) && (j != (Node_Array.GetLength(1) - 1)))
+                    {
+                        float dYS = Node_Array[i, j].y_Position - Node_Array[i, j - 1].y_Position;
+                        float dXW = Node_Array[i, j].x_Position - Node_Array[i - 1, j].x_Position;
+                        float dXE = Node_Array[i + 1, j].x_Position - Node_Array[i, j].x_Position;
+                        float dYN = Node_Array[i, j + 1].y_Position - Node_Array[i, j].y_Position;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+
+                    }
+                    else if (i > 0 && (j == (Node_Array.GetLength(1) - 1)) && i != (Node_Array.GetLength(0) - 1))
+                    {
+                        float dYS = Node_Array[i, j].y_Position - Node_Array[i, j - 1].y_Position;
+                        float dXW = Node_Array[i, j].x_Position - Node_Array[i - 1, j].x_Position;
+                        float dXE = Node_Array[i + 1, j].x_Position - Node_Array[i, j].x_Position;
+                        float dYN = 0.0f;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+
+                    }
+                    else if (j > 0 && (i == (Node_Array.GetLength(0) - 1)) && j != (Node_Array.GetLength(1) - 1))
+                    {
+                        float dYS = Node_Array[i, j].y_Position - Node_Array[i, j - 1].y_Position;
+                        float dXW = Node_Array[i, j].x_Position - Node_Array[i - 1, j].x_Position;
+                        float dXE = 0.0f;
+                        float dYN = Node_Array[i, j + 1].y_Position - Node_Array[i, j].y_Position;
+
+                        Node_Array[i, j].d_X_E = dXE;
+                        Node_Array[i, j].d_X_W = dXW;
+                        Node_Array[i, j].d_Y_N = dYN;
+                        Node_Array[i, j].d_Y_S = dYS;
+                    }
+
+
+
+                    
+                    
+
+                }
+
+                
+            }
+
+            foreach (Node node in Node_Array)
+            {
+                if (node.d_X_E == 0.0f && node.d_X_W == 0.0f && node.d_Y_N == 0.0f && node.d_Y_S == 0.0f)
+                {
+                    Console.WriteLine("Error on Node:  " + node.ID);
+                }
+
+            }
+        }
+
+        private void Generate_Nodes()
         {
             //List<Node> Node_List = new List<Node>();
 
-            Node[,] NodeArray = new Node[Coordinate_Array.GetLength(0), Coordinate_Array.GetLength(1)];
+            Node_Array = new Node[Coordinate_Array.GetLength(0) - 1, Coordinate_Array.GetLength(1) - 1];
 
             int ID = 0;
 
@@ -48,21 +198,26 @@ namespace TEModel
                     Coordinate lower_Right = Coordinate_Array[i + 1, j];
 
                     float DY = upper_Right.Y - lower_Right.Y;
-                    float DX = upper_Right.X - upper_Right.X;
-                    float X = lower_Left.X + (0.5f) * (DX);
-                    float Y = lower_Left.Y + (0.5f) * (DY);
+                    float DX = upper_Right.X - upper_Left.X;
+                    float X = lower_Left.X + (0.500f) * (DX);
+                    float Y = lower_Left.Y + (0.500f) * (DY);
 
-                    NodeArray[i, j] = new Node(X, Y, DY, DX, ID);
+                    foreach (Layer layer in Layer_List)
+                    {
+                        if (upper_Left.X >= layer.Layer_x0 && lower_Right.X <= layer.Layer_xf && upper_Left.Y <= layer.Layer_y0 && lower_Right.Y >= layer.Layer_yf)
+                        {
+                            material = layer.Layer_Material;
+                        }                        
+                    }
 
-                    //Node_List.Add(new Node(X, Y, DY, DX, ID));
-
-                    //Debug.WriteLine(Node_List.Last().x_Position + " , " + Node_List.Last().y_Position);
+                    Node_Array[i, j] = new Node(X, Y, DY, DX, ID);
+                    Node_Array[i, j].Material = material;
 
                     ID++;
                 }
             }
 
-            //Console.WriteLine("Nodes Created:  " + Node_List.Count);
+            Console.WriteLine("Nodes Created:  " + ID);
         }
 
         public void Generate_Lines(List<float> Initial_X, List<float> Initial_Y, int n_Divisions)

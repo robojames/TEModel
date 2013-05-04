@@ -361,7 +361,7 @@ namespace TEModel
             // Generates layers for air gaps that 'float' near top
             for (int i = 0; i < 8; i++)
             {
-                float x0 = Coord_Top_AirGaps[0] + ((float)i * (2 * (BiTE_Thickness + BiTE_AirGap)));
+                float x0 = Coord_Top_AirGaps[0] + ((float)i * (2.0f * (BiTE_Thickness + BiTE_AirGap)));
                 float y0 = Coord_Top_AirGaps[1];
                 float xf = x0 + BiTE_AirGap;
                 float yf = Coord_Top_AirGaps[3];
@@ -373,7 +373,7 @@ namespace TEModel
             // Generates layers for air gaps that 'float' near bottom
             for (int i = 0; i < 9; i++)
             {
-                float x0 = Coord_Bottom_AirGaps[0] + ((float)i * (2 * (BiTE_Thickness + BiTE_AirGap)));
+                float x0 = Coord_Bottom_AirGaps[0] + ((float)i * (2.0f * (BiTE_Thickness + BiTE_AirGap)));
                 float y0 = Coord_Bottom_AirGaps[1];
                 float xf = x0 + BiTE_AirGap;
                 float yf = Coord_Bottom_AirGaps[3];

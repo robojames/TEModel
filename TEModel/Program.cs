@@ -16,7 +16,7 @@ namespace TEModel
             List<float> X_Lines = new List<float>();
             List<float> Y_Lines = new List<float>();
 
-            int divisions_Per_Line = 14;
+            int divisions_Per_Line = 15;
 
             // Generate lines;
 
@@ -31,13 +31,21 @@ namespace TEModel
             InitialX = myGeom.x_array.ToList();
             InitialY = myGeom.y_array.ToList();
 
-            
+            Material_Initializer myMaterials = new Material_Initializer();
 
-            Mesh mesh = new Mesh(InitialX, InitialY, divisions_Per_Line, myGeom.Layer_List);
+            Mesh mesh = new Mesh(InitialX, InitialY, divisions_Per_Line, myGeom.Layer_List, myMaterials.Material_List);
 
             CSVHandler csv = new CSVHandler();
 
             csv.WriteMesh(mesh.Node_Array);
+
+            BoundaryCondition myBoundaries = new BoundaryCondition(mesh.Node_Array);
+
+            Solver mySolver = new Solver(mesh.Node_Array, 0.0001f, mesh, myBoundaries);
+
+            csv.Write_Temperature_Field(mesh.Node_Array);
+
+            Console.WriteLine("Finished...");
 
             Console.ReadLine();
 

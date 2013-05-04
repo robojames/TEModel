@@ -10,8 +10,9 @@ namespace TEModel
     class CSVHandler
     {
 
-        string R_directory = @"C:\Users\Therm-MEC Lab\Documents\GitHub\TEModel\Coordinatefile.csv";
-        string W_directory = @"C:\Users\Therm-MEC Lab\Documents\GitHub\TEModel\Mesh.csv";
+        string R_directory = @"C:\Users\James\Documents\GitHub\TEModel\Coordinatefile.csv";
+        string W_directory = @"C:\Users\James\Documents\GitHub\TEModel\Mesh.csv";
+        string WT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field.csv";
 
         public List<float> x;
         public List<float> y;
@@ -106,7 +107,7 @@ namespace TEModel
                     {
                         int Mat_ID;
 
-                        switch (Nodes[i,j].Material)
+                        switch (Nodes[i, j].Material)
                         {
                             case "Copper":
                                 Mat_ID = 1;
@@ -126,7 +127,38 @@ namespace TEModel
                         }
 
                         dataWrite.WriteLine(Nodes[i, j].ID + "," + Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + Mat_ID);
-                    }                    
+                    }
+                }
+
+                dataWrite.Close();
+            }
+            catch
+            {
+                Console.WriteLine("Error saving file, or writing was canceled ");
+            }
+        }
+
+        public void Write_Temperature_Field(Node[,] Nodes)
+        {
+            try
+            {
+                // 1 Copper
+                // 2 BiTe
+                // 3 Ceramic
+                // 4 Air
+
+                TextWriter dataWrite = new StreamWriter(WT_directory);
+
+                List<string> Lines = new List<string>();
+
+                dataWrite.WriteLine("XPOS" + "," + "YPOS" + "," + "TEMP");
+
+                for (int i = 0; i < Nodes.GetLength(0); i++)
+                {
+                    for (int j = 0; j < Nodes.GetLength(1); j++)
+                    {
+                        dataWrite.WriteLine(Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + Nodes[i, j].T);
+                    }
                 }
 
                 dataWrite.Close();

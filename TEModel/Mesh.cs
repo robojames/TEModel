@@ -19,12 +19,17 @@ namespace TEModel
         public Node[,] Node_Array;
 
         public List<Layer> Layer_List;
+
+        List<Material> MaterialList;
+
         string material;
 
  
-        public Mesh(List<float> Initial_X, List<float> Initial_Y, int n_Divisions, List<Layer> Layer_List)
+        public Mesh(List<float> Initial_X, List<float> Initial_Y, int n_Divisions, List<Layer> Layer_List, List<Material> Material_List)
         {
             this.Layer_List = Layer_List;
+
+            MaterialList = Material_List;
 
             Console.WriteLine("Generating Mesh Lines...");
             Generate_Lines(Initial_X, Initial_Y, n_Divisions);
@@ -38,6 +43,224 @@ namespace TEModel
             Console.WriteLine("Calculating delta_x's and delta_y's...");
             Calculate_dX_dY();
 
+            Console.WriteLine("Initializing Influence Coefficients...");
+
+
+
+            Initialize_Influence_Coefficients(9999.0f);     
+            Initialize_Influence_Coefficients_AP();
+
+            Console.WriteLine("Calculating Interfacial Conductivities...");
+            Calculate_Interface_Conductivities();
+
+            Console.WriteLine("Marking Nodes for Spatially Variant Source Terms...");
+            Mark_Nodes_For_Source_Terms();
+
+            Console.WriteLine("Calculating and Setting Spatial Source Terms...");
+            Set_Source_Terms(4.0f, 0.05f);
+
+            Initialize_Influence_Coefficients(9999.0f);
+            Initialize_Influence_Coefficients_AP();
+
+        }
+
+        private void Set_Source_Terms(float I, float R)
+        {
+            foreach (Node node in Node_Array)
+            {
+                if (node.has_Electron_Pumping_Top == true)
+                {
+                    node.sp = -I * 2 * node.Node_Material.alpha;
+                }
+
+                if (node.has_Joule_Heating == true)
+                {
+                    node.sc = I * I * R;
+                }
+
+                if (node.has_Electron_Pumping_Bottom == true)
+                {
+                    node.sp = I * 2 * node.Node_Material.alpha;
+                }
+            }
+        }
+
+        private void Mark_Nodes_For_Source_Terms()
+        {
+            int n_Nodes_Marked = 0;
+
+            List<float> y_Pos_BiTe = new List<float>();
+
+            foreach (Node node in Node_Array)
+            {
+                if (node.Node_Material.Material_Name == "BiTe")
+                {
+                    y_Pos_BiTe.Add(node.y_Position);
+                }
+            }
+
+            float y_Max_BiTe = y_Pos_BiTe.Max();
+            float y_Min_BiTe = y_Pos_BiTe.Min();
+
+            foreach (Node node in Node_Array)
+            {
+                if (node.Node_Material.Material_Name == "BiTe" && node.y_Position == y_Max_BiTe)
+                {
+                    node.has_Electron_Pumping_Top = true;
+                    n_Nodes_Marked++;
+                }
+
+                if (node.Node_Material.Material_Name == "BiTe" && node.y_Position == y_Min_BiTe)
+                {
+                    node.has_Electron_Pumping_Bottom = true;
+                    n_Nodes_Marked++;
+                }
+
+                if (node.Node_Material.Material_Name == "BiTe" | node.Node_Material.Material_Name == "Copper")
+                {
+                    node.has_Joule_Heating = true;
+                    n_Nodes_Marked++;
+                }
+            }
+
+
+            for (int i = 1; i < Node_Array.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < Node_Array.GetLength(1) - 1; j++)
+                {
+                    if (Node_Array[i,j].has_Electron_Pumping_Bottom == true)
+                    {
+                        Node_Array[i, j - 1].has_Electron_Pumping_Bottom = true;
+                    }
+
+                    if (Node_Array[i, j].has_Electron_Pumping_Top == true)
+                    {
+                        Node_Array[i, j + 1].has_Electron_Pumping_Top = true;
+                    }
+                }
+            }
+            
+
+            Console.WriteLine("Nodes marked for source terms:  " + n_Nodes_Marked);
+
+        }
+
+        private void Initialize_Influence_Coefficients_AP()
+        {
+            for (int i = 1; i < Node_Array.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < Node_Array.GetLength(1) - 1; j++)
+                {
+                    Node_Array[i, j].AP = Node_Array[i, j].AE + Node_Array[i, j].AW + Node_Array[i, j].AS + Node_Array[i, j].AN + Node_Array[i, j].AP0 - (Node_Array[i, j].sp * Node_Array[i, j].delta_Y * Node_Array[i, j].delta_X);
+                }
+            }
+        }
+
+        public void Initialize_Influence_Coefficients(float dt)
+        {
+            for (int i = 1; i < Node_Array.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < Node_Array.GetLength(1) - 1; j++)
+                {
+                    Node_Array[i, j].AE = ((Node_Array[i - 1, j].Node_Material.k) * (Node_Array[i, j].delta_Y)) / (Node_Array[i, j].d_X_E);
+                    Node_Array[i, j].AS = (Node_Array[i, j - 1].Node_Material.k * Node_Array[i, j].delta_X) / (Node_Array[i, j].d_Y_S);
+                    Node_Array[i, j].AW = (Node_Array[i + 1, j].Node_Material.k * Node_Array[i, j].delta_Y) / (Node_Array[i, j].d_X_W);
+                    Node_Array[i, j].AN = (Node_Array[i, j + 1].Node_Material.k * Node_Array[i, j].delta_X) / (Node_Array[i, j].d_Y_N);
+
+                    Node_Array[i, j].AP0 = (Node_Array[i, j].Node_Material.rho * Node_Array[i, j].Node_Material.cp * Node_Array[i, j].delta_X * Node_Array[i, j].delta_Y) / dt;
+
+                    Node_Array[i, j].AP = Node_Array[i, j].AE + Node_Array[i, j].AW + Node_Array[i, j].AS + Node_Array[i, j].AN + Node_Array[i, j].AP0 - (Node_Array[i, j].sp * Node_Array[i, j].delta_Y * Node_Array[i, j].delta_X);
+
+                    Node_Array[i, j].b = Node_Array[i, j].sc * Node_Array[i, j].delta_X * Node_Array[i, j].delta_Y + Node_Array[i, j].AP0 * Node_Array[i,j].T_Past; 
+                }
+            }
+        }
+
+        private void Calculate_Interface_Conductivities()
+        {
+            int n_Adjusted_Interfaces = 0;
+
+            for (int i = 1; i < Node_Array.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < Node_Array.GetLength(1) - 1; j++)
+                {
+                    Material P_Material = Node_Array[i, j].Node_Material;
+                    Material N_Material = Node_Array[i, j + 1].Node_Material;
+                    Material E_Material = Node_Array[i + 1, j].Node_Material;
+                    Material S_Material = Node_Array[i, j - 1].Node_Material;
+                    Material W_Material = Node_Array[i - 1, j].Node_Material;
+                    
+                    //
+                    // Adjust Northern Conductivity
+                    //
+                    if (P_Material.Material_Name != N_Material.Material_Name)
+                    {
+                        float delt_n = Node_Array[i, j + 1].y_Position - Node_Array[i, j].y_Position;
+                        float delt_n_plus = (0.5f * Node_Array[i, j + 1].delta_Y);
+
+                        float f_n = delt_n_plus / delt_n;
+
+                        float k_n = 1.0f / (((1 - f_n) / Node_Array[i, j].Node_Material.k) + (f_n / Node_Array[i, j + 1].Node_Material.k));
+
+                        Node_Array[i, j].AN = (k_n * Node_Array[i, j].delta_X) / Node_Array[i, j].d_Y_N;
+
+                        n_Adjusted_Interfaces++;
+                    }
+
+                    //
+                    // Adjust Eastern Conductivity
+                    //
+                    if (P_Material.Material_Name != E_Material.Material_Name)
+                    {
+                        float delt_e = Node_Array[i + 1, j].x_Position - Node_Array[i, j].x_Position;
+                        float delt_e_plus = (0.5f * Node_Array[i + 1, j].delta_X);
+
+                        float f_e = delt_e_plus / delt_e;
+
+                        float k_e = 1.0f / (((1 - f_e) / Node_Array[i, j].Node_Material.k) + (f_e / Node_Array[i + 1, j].Node_Material.k));
+
+                        Node_Array[i, j].AE = (k_e * Node_Array[i, j].delta_Y) / Node_Array[i, j].d_X_E;
+
+                        n_Adjusted_Interfaces++;
+                    }
+
+                    //
+                    // Adjust Southern Conductivity
+                    //
+                    if (P_Material.Material_Name != S_Material.Material_Name)
+                    {
+                        float delt_s = Node_Array[i, j].y_Position - Node_Array[i, j - 1].y_Position;
+                        float delt_s_plus = (0.5f * Node_Array[i, j - 1].delta_Y);
+
+                        float f_s = delt_s_plus / delt_s;
+
+                        float k_s = 1.0f / (((1 - f_s) / (Node_Array[i, j].Node_Material.k)) + (f_s / Node_Array[i, j - 1].Node_Material.k));
+
+                        Node_Array[i, j].AS = (k_s * Node_Array[i, j].delta_X) / Node_Array[i, j].d_Y_S;
+
+                        n_Adjusted_Interfaces++;
+                    }
+
+                    //
+                    // Adjust Western Conductivity
+                    //
+                    if (P_Material.Material_Name != W_Material.Material_Name)
+                    {
+                        float delt_w = Node_Array[i - 1, j].x_Position - Node_Array[i, j].x_Position;
+                        float delt_w_plus = (0.5f * Node_Array[i - 1, j].delta_X);
+
+                        float f_w = delt_w_plus / delt_w;
+
+                        float k_w = 1.0f / (((1 - f_w) / Node_Array[i, j].Node_Material.k) + (f_w / Node_Array[i + 1, j].Node_Material.k));
+
+                        Node_Array[i, j].AW = (k_w * Node_Array[i, j].delta_Y) / Node_Array[i, j].d_X_W;
+
+                        n_Adjusted_Interfaces++;
+                    }
+                }
+            }
+
+            Console.WriteLine("Interfaces Adjusted:  " + n_Adjusted_Interfaces);
         }
 
 
@@ -244,6 +467,16 @@ namespace TEModel
                 }
             }
 
+            foreach (Node node in Node_Array)
+            {
+                foreach (Material mat in MaterialList)
+                {
+                    if (node.Material == mat.Material_Name)
+                    {
+                        node.Node_Material = mat;
+                    }
+                }
+            }
 
             Console.WriteLine("Nodes Created:  " + ID);
         }

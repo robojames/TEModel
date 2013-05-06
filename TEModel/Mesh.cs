@@ -54,7 +54,7 @@ namespace TEModel
             Mark_Nodes_For_Source_Terms();
 
             Console.WriteLine("Calculating and Setting Spatial Source Terms...");
-            Set_Source_Terms(1.0f);
+            Set_Source_Terms(4.0f);
 
             Console.WriteLine("Initializing Influence Coefficients...");
             Initialize_Influence_Coefficients(999999.0f);
@@ -77,14 +77,14 @@ namespace TEModel
             {
                 if (node.has_Electron_Pumping_Top == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    node.sp = -2.0f * (I / Electron_Constant_BiTE) * alpha_BiTE * 2500000.0f;
+                    node.sp = (I / Electron_Constant_BiTE) * alpha_BiTE;
                     //Debug.WriteLine("First:  " + node.sp);
                 }
 
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "Copper")
                 {
                     //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * Copper_Rho_E;
-                    node.sc = I * I * Copper_Rho_E * 0.008484f;
+                    node.sc = I * I * Copper_Rho_E;
                     //node.sc = I * I * Copper_Rho_E * 0.0024f;
                     //Debug.WriteLine("Second:  " + node.sc);
                 }
@@ -92,14 +92,14 @@ namespace TEModel
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "BiTe")
                 {
                     //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * BiTe_Rho_E;
-                    node.sc = I * I * BiTe_Rho_E * 9.4545f * (float)Math.Pow(10, -4);
+                    node.sc = I * I * BiTe_Rho_E;
                     //node.sc = I * I * BiTe_Rho_E * 7.15819f * (float)Math.Pow(10, -4);
                     //Debug.WriteLine("Third:  " + node.sc);
                 }
 
                 if (node.has_Electron_Pumping_Bottom == true)
                 {
-                    node.sp = 2.0f * (I / Electron_Constant_BiTE) * alpha_BiTE * 2500000.0f;
+                    node.sp = (I / Electron_Constant_BiTE) * alpha_BiTE;
                     //Debug.WriteLine("Fourth:  " + node.sp);
                 }
             }

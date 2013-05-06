@@ -10,10 +10,10 @@ namespace TEModel
     class CSVHandler
     {
 
-        string R_directory = @"C:\Users\James\Documents\GitHub\TEModel\Coordinatefile.csv";
-        string W_directory = @"C:\Users\James\Documents\GitHub\TEModel\Mesh.csv";
-        string WT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field.csv";
-        string WdT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field_Delta.csv";
+        string R_directory = @"C:\Users\Therm-MEC Lab\Documents\GitHub\TEModel\Coordinatefile.csv";
+        string W_directory = @"C:\Users\Therm-MEC Lab\Documents\GitHub\TEModel\Mesh.csv";
+        string WT_directory = @"C:\Users\Therm-MEC Lab\Documents\GitHub\TEModel\T_Field.csv";
+        string WdT_directory = @"C:\Users\Therm-MEC Lab\Documents\GitHub\TEModel\T_Field_Delta.csv";
 
 
         public List<float> x;

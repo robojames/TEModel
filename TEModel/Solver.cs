@@ -72,8 +72,9 @@ namespace TEModel
 
                 }
 
+                phipast_to_phi(Nodes);
 
-                //Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
+                Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
                 //Boundary_C_Object.Apply_Boundary_Conditions_Solver();
 
 
@@ -82,40 +83,40 @@ namespace TEModel
                 // B: AN
                 // C: AS
                 // D: b
-                //for (int i = 1; i < x_nodes_max; i++)
-                //{
-                //    P_Y[0] = Nodes[i, 0].AN / Nodes[i, 0].AP;
-                //    Q_Y[0] = Nodes[i, 0].b / Nodes[i, 0].AP;
+                for (int i = 1; i < x_nodes_max; i++)
+                {
+                    P_Y[0] = Nodes[i, 0].AN / Nodes[i, 0].AP;
+                    Q_Y[0] = Nodes[i, 0].b / Nodes[i, 0].AP;
 
-                //    for (int j = 1; j < y_nodes_max + 1; j++)
-                //    {
-                //        P_Y[j] = Nodes[i, j].AN / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
-                //        Q_Y[j] = (Nodes[i, j].b + Nodes[i, j].AE * Nodes[i + 1, j].T + Nodes[i, j].AW * Nodes[i - 1, j].T + Nodes[i, j].AS * Q_Y[j - 1]) / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
-                //    }
+                    for (int j = 1; j < y_nodes_max + 1; j++)
+                    {
+                        P_Y[j] = Nodes[i, j].AN / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
+                        Q_Y[j] = (Nodes[i, j].b + Nodes[i, j].AE * Nodes[i + 1, j].T + Nodes[i, j].AW * Nodes[i - 1, j].T + Nodes[i, j].AS * Q_Y[j - 1]) / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
+                    }
 
-                //    Nodes[i, y_nodes_max].T = Q_Y[y_nodes_max];
+                    Nodes[i, y_nodes_max].T = Q_Y[y_nodes_max];
 
-                //    for (int j = y_nodes_max - 1; j >= 0; --j)
-                //    {
-                //        Nodes[i, j].T = P_Y[j] * Nodes[i, j + 1].T + Q_Y[j];
-                //    }
-                //}
+                    for (int j = y_nodes_max - 1; j >= 0; --j)
+                    {
+                        Nodes[i, j].T = P_Y[j] * Nodes[i, j + 1].T + Q_Y[j];
+                    }
+                }
 
                 phipast_to_phi(Nodes);
 
                 max_Err = (float)Calculate_Average_Error(Nodes);
 
-                //Debug.WriteLine("Max Error:  " + max_Err + "        Residual:  " + Calculate_Average_Residuals());
+                Debug.WriteLine("Max Error:  " + max_Err + "        Residual:  " + Calculate_Residuals(Nodes));
 
 
-                //Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
+                Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
                 //Boundary_C_Object.Apply_Boundary_Conditions_Solver();
                  
                 n_iter++;
 
                 dT.Add((float)Calculate_Residuals(Nodes));
 
-                if (n_iter > 20000)
+                if (n_iter > 10000)
                     break;
 
             } // End While Loop 
@@ -190,49 +191,33 @@ namespace TEModel
             double avg_Res = 0;
 
             // Iterate through both x/y planes and calculate the residual at each node
-            for (int i = 2; i < Nodes.GetLength(0) - 2; i++)
+            for (int i = 1; i < Nodes.GetLength(0) - 1; i++)
             {
-                for (int j = 2; j < Nodes.GetLength(1) - 2; j++)
+                for (int j = 1; j < Nodes.GetLength(1) - 1; j++)
                 {
-                    Nodes[i, j].res = Nodes[i, j].AP * Nodes[i, j].T - Nodes[i + 1, j].AE * Nodes[i + 1, j].T - Nodes[i - 1, j].AW * Nodes[i - 1, j].T - Nodes[i, j + 1].AN * Nodes[i, j + 1].T - Nodes[i, j - 1].AS * Nodes[i, j - 1].T - Nodes[i, j].b;
+                    Nodes[i, j].res = Nodes[i, j].AP * Nodes[i, j].T - (Nodes[i + 1, j].AE * Nodes[i + 1, j].T + Nodes[i - 1, j].AW * Nodes[i - 1, j].T + Nodes[i, j + 1].AN * Nodes[i, j + 1].T + Nodes[i, j - 1].AS * Nodes[i, j - 1].T + Nodes[i, j].b);
 
                     Nodes[i, j].res *= Nodes[i, j].res; // Equivalent to Nodes[i,j].res^2
 
                     Nodes[i, j].res = (float)Math.Sqrt(Nodes[i, j].res);
+
+                    avg_Res += Nodes[i, j].res;
+
                 }
 
             }
 
-            // Average Residuals
-            foreach (Node node in Nodes)
-            {
-                avg_Res += node.res;
-            }
+            //// Average Residuals
+            //foreach (Node node in Nodes)
+            //{
+            //    avg_Res += node.res;
+            //}
 
-            avg_Res /= (Nodes.GetLength(0) + Nodes.GetLength(1));
+            avg_Res = avg_Res / (double)(Nodes.GetLength(0) * Nodes.GetLength(1));
             
             return avg_Res;
 
         }
-
-        public double Calculate_Average_Residuals()
-        {
-            double Residual_Average = 0;
-
-            double sum = 0;
-
-            for (int i = 2; i < Nodes.GetLength(0) - 2; i++)
-            {
-                for (int j = 2; j < Nodes.GetLength(1) - 2; j++)
-                {
-                    double temp_Residual = Math.Abs((Nodes[i, j].AP * Nodes[i, j].T) - (Nodes[i + 1, j].AE * Nodes[i + 1, j].T) - (Nodes[i - 1, j].AW * Nodes[i - 1, j].T) - (Nodes[i, j + 1].AN * Nodes[i, j + 1].T) - (Nodes[i, j - 1].AS * Nodes[i, j - 1].T) - Nodes[i, j].b);
-                    sum += temp_Residual;
-                }
-            }
-
-            Residual_Average = sum / ((double)Nodes.GetLength(0) * (double)Nodes.GetLength(1));
-
-            return Residual_Average;
-        }
+                
     }
 }

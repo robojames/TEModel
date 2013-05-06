@@ -13,6 +13,8 @@ namespace TEModel
         /// </summary>
         public int ID;
 
+        public float res;
+        public float err;
         /// <summary>
         /// X Position of the Node
         /// </summary>
@@ -55,9 +57,9 @@ namespace TEModel
 
 
         public string Material;
-        public bool has_Joule_Heating;
-        public bool has_Electron_Pumping_Top;
-        public bool has_Electron_Pumping_Bottom;
+        public bool has_Joule_Heating = false;
+        public bool has_Electron_Pumping_Top = false;
+        public bool has_Electron_Pumping_Bottom = false;
         public float AP;
         public float AN;
         public float AE;
@@ -81,6 +83,16 @@ namespace TEModel
             x_Position = X;
             y_Position = Y;
             this.ID = ID;
+            this.sp = 0;
+            this.sc = 0;
+            this.b = 0;
+            this.AP = 0;
+            this.AE = 0;
+            this.AW = 0;
+            this.AN = 0;
+            this.AS = 0;
+            this.AP0 = 0;
+            
         }
     }
 }

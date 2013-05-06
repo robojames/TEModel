@@ -13,6 +13,8 @@ namespace TEModel
         string R_directory = @"C:\Users\James\Documents\GitHub\TEModel\Coordinatefile.csv";
         string W_directory = @"C:\Users\James\Documents\GitHub\TEModel\Mesh.csv";
         string WT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field.csv";
+        string WdT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field_Delta.csv";
+
 
         public List<float> x;
         public List<float> y;
@@ -99,7 +101,7 @@ namespace TEModel
 
                 List<string> Lines = new List<string>();
 
-                dataWrite.WriteLine("ID" + "," + "XPOS" + "," + "YPOS" + "," + "Material");
+                dataWrite.WriteLine("ID" + "," + "XPOS" + "," + "YPOS" + "," + "Material" + "," + "Flag");
 
                 for (int i = 0; i < Nodes.GetLength(0); i++)
                 {
@@ -126,8 +128,43 @@ namespace TEModel
                                 break;
                         }
 
-                        dataWrite.WriteLine(Nodes[i, j].ID + "," + Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + Mat_ID);
+                        int spFlag;
+
+                        if (Nodes[i, j].sp != 0)
+                        {
+                            spFlag = 1;
+                        }
+                        else
+                        {
+                            spFlag = 0;
+                        }
+
+                        dataWrite.WriteLine(Nodes[i, j].ID + "," + Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + Mat_ID + "," + spFlag);
                     }
+                }
+
+                dataWrite.Close();
+            }
+            catch
+            {
+                Console.WriteLine("Error saving file, or writing was canceled ");
+            }
+        }
+
+        public void WritedT(List<float> dT)
+        {
+            try
+            {
+                
+                TextWriter dataWrite = new StreamWriter(WdT_directory);
+
+                List<string> Lines = new List<string>();
+
+                dataWrite.WriteLine("Iteration" + "," + "Gamma");
+
+                for (int i = 0; i < dT.Count; i++)
+                {
+                    dataWrite.WriteLine(i + "," + dT[i]);
                 }
 
                 dataWrite.Close();

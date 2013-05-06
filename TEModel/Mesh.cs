@@ -29,6 +29,7 @@ namespace TEModel
         {
             this.Layer_List = Layer_List;
 
+            
             MaterialList = Material_List;
 
             Console.WriteLine("Generating Mesh Lines...");
@@ -43,44 +44,63 @@ namespace TEModel
             Console.WriteLine("Calculating delta_x's and delta_y's...");
             Calculate_dX_dY();
 
-            Console.WriteLine("Initializing Influence Coefficients...");
-
-
-
-            Initialize_Influence_Coefficients(9999.0f);     
-            Initialize_Influence_Coefficients_AP();
-
-            Console.WriteLine("Calculating Interfacial Conductivities...");
-            Calculate_Interface_Conductivities();
+            foreach (Node node in Node_Array)
+            {
+                node.T = 300.0f;
+                node.T_Past = 300.0f;
+            }
 
             Console.WriteLine("Marking Nodes for Spatially Variant Source Terms...");
             Mark_Nodes_For_Source_Terms();
 
             Console.WriteLine("Calculating and Setting Spatial Source Terms...");
-            Set_Source_Terms(4.0f, 0.05f);
+            Set_Source_Terms(1.0f);
 
-            Initialize_Influence_Coefficients(9999.0f);
-            Initialize_Influence_Coefficients_AP();
+            Console.WriteLine("Initializing Influence Coefficients...");
+            Initialize_Influence_Coefficients(999999.0f);
+
+            Console.WriteLine("Calculating Interfacial Conductivities...");
+            Calculate_Interface_Conductivities();
 
         }
 
-        private void Set_Source_Terms(float I, float R)
+        private void Set_Source_Terms(float I)
         {
+            float Electron_Constant_BiTE = 2.17f * (float)Math.Pow(10, -6);
+            float Joule_Constant = 2.17f * (float)Math.Pow(10,-6);
+            float Copper_Rho_E = 1.68f * (float)Math.Pow(10, -8);
+            float BiTe_Rho_E = (9.2f) * (float)Math.Pow(10, -4);
+            float alpha_BiTE = 0.378f * (float)Math.Pow(10, -4);
+            
+
             foreach (Node node in Node_Array)
             {
-                if (node.has_Electron_Pumping_Top == true)
+                if (node.has_Electron_Pumping_Top == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    node.sp = -I * 2 * node.Node_Material.alpha;
+                    node.sp = -2.0f * (I / Electron_Constant_BiTE) * alpha_BiTE * 2500000.0f;
+                    //Debug.WriteLine("First:  " + node.sp);
                 }
 
-                if (node.has_Joule_Heating == true)
+                if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "Copper")
                 {
-                    node.sc = I * I * R;
+                    //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * Copper_Rho_E;
+                    node.sc = I * I * Copper_Rho_E * 0.008484f;
+                    //node.sc = I * I * Copper_Rho_E * 0.0024f;
+                    //Debug.WriteLine("Second:  " + node.sc);
+                }
+
+                if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "BiTe")
+                {
+                    //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * BiTe_Rho_E;
+                    node.sc = I * I * BiTe_Rho_E * 9.4545f * (float)Math.Pow(10, -4);
+                    //node.sc = I * I * BiTe_Rho_E * 7.15819f * (float)Math.Pow(10, -4);
+                    //Debug.WriteLine("Third:  " + node.sc);
                 }
 
                 if (node.has_Electron_Pumping_Bottom == true)
                 {
-                    node.sp = I * 2 * node.Node_Material.alpha;
+                    node.sp = 2.0f * (I / Electron_Constant_BiTE) * alpha_BiTE * 2500000.0f;
+                    //Debug.WriteLine("Fourth:  " + node.sp);
                 }
             }
         }
@@ -116,13 +136,22 @@ namespace TEModel
                     n_Nodes_Marked++;
                 }
 
-                if (node.Node_Material.Material_Name == "BiTe" | node.Node_Material.Material_Name == "Copper")
+                if (node.Node_Material.Material_Name == "BiTe" )
+                {
+                    node.has_Joule_Heating = true;
+                    n_Nodes_Marked++;
+                }
+
+                if (node.Node_Material.Material_Name == "Copper")
                 {
                     node.has_Joule_Heating = true;
                     n_Nodes_Marked++;
                 }
             }
 
+            // This is the problem
+            List<Node> NodeList_Bottom = new List<Node>();
+            List<Node> NodeList_Top = new List<Node>();
 
             for (int i = 1; i < Node_Array.GetLength(0) - 1; i++)
             {
@@ -130,14 +159,24 @@ namespace TEModel
                 {
                     if (Node_Array[i,j].has_Electron_Pumping_Bottom == true)
                     {
-                        Node_Array[i, j - 1].has_Electron_Pumping_Bottom = true;
+                        NodeList_Bottom.Add(Node_Array[i, j - 1]);
                     }
 
                     if (Node_Array[i, j].has_Electron_Pumping_Top == true)
                     {
-                        Node_Array[i, j + 1].has_Electron_Pumping_Top = true;
+                        NodeList_Top.Add(Node_Array[i, j + 1]);
                     }
                 }
+            }
+
+            foreach (Node node in NodeList_Bottom)
+            {
+                node.has_Electron_Pumping_Bottom = true;
+            }
+
+            foreach (Node node in NodeList_Top)
+            {
+                node.has_Electron_Pumping_Top = true;
             }
             
 
@@ -158,6 +197,7 @@ namespace TEModel
 
         public void Initialize_Influence_Coefficients(float dt)
         {
+
             for (int i = 1; i < Node_Array.GetLength(0) - 1; i++)
             {
                 for (int j = 1; j < Node_Array.GetLength(1) - 1; j++)
@@ -171,9 +211,14 @@ namespace TEModel
 
                     Node_Array[i, j].AP = Node_Array[i, j].AE + Node_Array[i, j].AW + Node_Array[i, j].AS + Node_Array[i, j].AN + Node_Array[i, j].AP0 - (Node_Array[i, j].sp * Node_Array[i, j].delta_Y * Node_Array[i, j].delta_X);
 
-                    Node_Array[i, j].b = Node_Array[i, j].sc * Node_Array[i, j].delta_X * Node_Array[i, j].delta_Y + Node_Array[i, j].AP0 * Node_Array[i,j].T_Past; 
+                    Node_Array[i, j].b = Node_Array[i, j].sc * Node_Array[i, j].delta_X * Node_Array[i, j].delta_Y + Node_Array[i, j].AP0 * Node_Array[i,j].T_Past;
                 }
             }
+
+            Calculate_Interface_Conductivities();
+
+            Initialize_Influence_Coefficients_AP();
+
         }
 
         private void Calculate_Interface_Conductivities()
@@ -260,7 +305,7 @@ namespace TEModel
                 }
             }
 
-            Console.WriteLine("Interfaces Adjusted:  " + n_Adjusted_Interfaces);
+            //Console.WriteLine("Interfaces Adjusted:  " + n_Adjusted_Interfaces);
         }
 
 
@@ -384,10 +429,6 @@ namespace TEModel
                     }
 
 
-
-                    
-                    
-
                 }
 
                 
@@ -443,9 +484,9 @@ namespace TEModel
             }
 
             // Node Corrections
-            for (int i = 1; i < Coordinate_Array.GetLength(0) - 1; i++)
+            for (int i = 1; i < Node_Array.GetLength(0) - 1; i++)
             {
-                for (int j = 1; j < Coordinate_Array.GetLength(1) - 1; j++)
+                for (int j = 1; j < Node_Array.GetLength(1) - 1; j++)
                 {
                     if (Node_Array[i, j].Material == "BiTe" && (Node_Array[i + 1, j].Material != "BiTe"))
                     {
@@ -463,6 +504,28 @@ namespace TEModel
                     else if (Node_Array[i, j].Material == "Copper" && (Node_Array[i - 1, j].Material != "Copper"))
                     {
                         Node_Array[i - 1, j].Material = "Air";
+                    }
+
+                    if (Node_Array[i, j].x_Position > 0.02613f && Node_Array[i, j].Material == "Air" && Node_Array[i,j].x_Position < 0.00276f)
+                    {
+                        Node_Array[i, j].Material = "Copper";
+                    }
+                }
+            }
+
+            for (int i = 1; i < Node_Array.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < Node_Array.GetLength(1) - 1; j++)
+                {
+                    if (Node_Array[i, j].Material == "BiTe")
+                    {
+                        for (int k = 0; k < Node_Array.GetLength(1) - 1; k++)
+                        {
+                            if (Node_Array[i, k].Material == "Air")
+                            {
+                                Node_Array[i, k].Material = "Copper";
+                            }
+                        }
                     }
                 }
             }

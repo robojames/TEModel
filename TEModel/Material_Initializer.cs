@@ -23,7 +23,7 @@ namespace TEModel
         /// <summary>
         /// Thermal Conductivity of Copper [W / m K] at 20 C
         /// </summary>
-        const float k_Copper = 401.0f;
+        const float k_Copper = 386.0f;
 
         /// <summary>
         /// Heat Capacity of Copper [J/kg K] at 20 C
@@ -43,7 +43,7 @@ namespace TEModel
         /// <summary>
         /// Heat Capacity of Ceramic Alumina used in TEM [J/kg K] at 20 C
         /// </summary>
-        const float cp_Ceramic = 775.0f;
+        const float cp_Ceramic = 870.0f;
 
         /// <summary>
         /// Density of Bismuth Telluride [kg/m^3] at 20 C
@@ -80,17 +80,17 @@ namespace TEModel
         /// <summary>
         /// Density of Air [kg/m^3] at 20 C
         /// </summary>
-        const float rho_Air = 25.0f;
+        const float rho_Air = 1.204f;
 
         /// <summary>
         /// Thermal Conductivity of Air [W / m K] at 20 C
         /// </summary>
-        const float k_Air = 25.0f;
+        const float k_Air = 0.02570f;
 
         /// <summary>
         /// Heat Capacity of air [J/kg K] at 20 C
         /// </summary>
-        const float cp_Air = 25.0f;
+        const float cp_Air = 1005.0f;
 
         const float alpha_BiTE = 0.00025f; 
 
@@ -136,7 +136,14 @@ namespace TEModel
             for (int i = 0; i < n_Materials; i++ )
             {
                 // Creates new Material object and adds it to the Material_List for later recollection or modification
-                Material_List.Add(new Material(MatList_Name[i], k[i], cp[i], alpha_BiTE, rho[i]));
+                if (MatList_Name[i] == "BiTe")
+                {
+                    Material_List.Add(new Material(MatList_Name[i], k[i], cp[i], alpha_BiTE, rho[i]));
+                }
+                else
+                {
+                    Material_List.Add(new Material(MatList_Name[i], k[i], cp[i], 0.0f, rho[i]));
+                }
 
             }
 

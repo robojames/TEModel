@@ -8,6 +8,7 @@ M = CSVREAD(fileName, 1, 0);
 x = M(:,2);
 y = M(:,3);
 mat = M(:,4);
+spFlag = M(:,5);
 
 for i = 1:max(size(x))
    % Copper
@@ -31,10 +32,18 @@ for i = 1:max(size(x))
    end
    
    
+   
+   
 end
 
 %plot(x,y, '*k'); 
 xlabel('X Position, m'); ylabel('Y Position, m');
+
+%for i = 1:max(size(x))
+%   if spFlag(i) == 1
+%       plot(x(i),y(i),'*k');
+%   end
+%end
 
 
 end

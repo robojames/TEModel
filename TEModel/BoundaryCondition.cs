@@ -21,21 +21,19 @@ namespace TEModel
         {
             this.Node_Array = Node_Array;
 
-            
-
             float dt = 999999.0f;
 
-            h_Top = 15.0f;
+            h_Top = 0.0f;
             h_Bottom = 0.0f;
             h_Left = 0.0f;
             h_Right = 0.0f;
 
-            T_Top = 0.0f;
+            T_Top = 280.0f;
             T_Bottom = 243.0f;
-            T_Right = 0.0f;
-            T_Left = 0.0f;
+            T_Right = 280.0f;
+            T_Left = 280.0f;
 
-            Tinf_Top = 290.0f;
+            Tinf_Top = 0.0f;
             Tinf_Bottom = 0.0f;
             Tinf_Right = 0.0f;
             Tinf_Left = 0.0f;
@@ -45,10 +43,10 @@ namespace TEModel
             q_Left = 0.0f;
             q_Right = 0.0f;
 
-            is_TBC_Top = 1;
+            is_TBC_Top = 0;
             is_TBC_Bottom = 0;
-            is_TBC_Right = 1;
-            is_TBC_Left = 1;
+            is_TBC_Right = 0;
+            is_TBC_Left = 0;
 
             Console.WriteLine("Setting Boundary Conditions...");
             Apply_Boundary_Conditions(dt);
@@ -64,7 +62,7 @@ namespace TEModel
             int max_Y = Node_Array.GetLength(1) - 1;
             // 1 if temperature bc is used, 0 otherwise for is_TBC
             // Top and Bottom
-            for (int i = 0; i < max_X; i++)
+            for (int i = 0; i <= max_X; i++)
             {
                 // Top First
                 Node_Array[i, max_Y].AE = 0.0f;
@@ -94,7 +92,7 @@ namespace TEModel
                 Node_Array[i, 0].T = T_Bottom;
             }
 
-            for (int j = 0; j < max_Y; j++)
+            for (int j = 0; j <= max_Y; j++)
             {
                 // Left Side
                 Node_Array[0, j].AE = is_TBC_Left * Node_Array[0, j].Node_Material.k * (Node_Array[0, j].delta_Y) / (Node_Array[0, j].d_X_E);

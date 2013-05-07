@@ -47,7 +47,7 @@ namespace TEModel
             foreach (Node node in Node_Array)
             {
                 node.T = 300.0f;
-                node.T_Past = 0.0f;
+                node.T_Past = 300.0f;
             }
 
             Console.WriteLine("Marking Nodes for Spatially Variant Source Terms...");
@@ -74,56 +74,52 @@ namespace TEModel
         {
             int n_Applied = 0;
 
-            float Electron_Constant_BiTE = 2.17f * (float)Math.Pow(10, -6);
-            float Joule_Constant = 2.17f * (float)Math.Pow(10,-6);
+
             float Copper_Rho_E = 1.68f * (float)Math.Pow(10, -8);
             float BiTe_Rho_E = (1.0f) * (float)Math.Pow(10, -5);
-
-
             float alpha_BiTE = 2.0f * (float)Math.Pow(10, -4);
-            float J = I / (2.17f * (float)Math.Pow(10, -3));
 
             foreach (Node node in Node_Array)
             {
                 if (node.has_Electron_Pumping_Top == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    //node.sp = -alpha_BiTE * J;
+                    float J = I / node.delta_X;
 
-                    node.sp = J * alpha_BiTE;// *node.delta_X;
+                    node.sp = (-J * alpha_BiTE) / node.delta_Y;
+
                     n_Applied++;
                 }
 
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "Copper")
                 {
 
-                    node.sc = J * J * Copper_Rho_E; //* node.delta_X * node.delta_Y;
-                    //node.sc = J * J * Copper_Rho_E;
-                    //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * Copper_Rho_E;
-                    //node.sc = I * I * (Copper_Rho_E / (node.delta_Y * node.delta_X));
-                    //node.sc = I * I * Copper_Rho_E * 0.0024f;
+                    float J = I / node.delta_Y;
+
+                    node.sc = J * J * Copper_Rho_E;
+                    
                     n_Applied++;
                 }
 
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "BiTe")
                 {
+                    float J = I / node.delta_X;
 
-                    node.sc = J * J * BiTe_Rho_E;// *node.delta_X * node.delta_Y;
-                     //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * BiTe_Rho_E;
-                    //node.sc = I * I * (BiTe_Rho_E / (node.delta_X * node.delta_Y));
-                    //node.sc = I * I * BiTe_Rho_E * 7.15819f * (float)Math.Pow(10, -4);
+                    node.sc = J * J * BiTe_Rho_E;
+                    
                     n_Applied++;
                 }
 
                 if (node.has_Electron_Pumping_Bottom == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    //node.sp = alpha_BiTE * J;
+                    float J = I / node.delta_X;
 
-                    node.sp = -J * alpha_BiTE;// *node.delta_X;
+                    node.sp = J * alpha_BiTE / node.delta_Y;
+
                     n_Applied++;
                 }
 
                 //if (node.sp != 0 | node.sc != 0)
-                    //Debug.WriteLine(node.sp + "     " + node.sc);
+                //    Debug.WriteLine(node.sp + "     " + node.sc);
             }
 
             Console.WriteLine("Source Terms Applied to " + n_Applied + " nodes.");

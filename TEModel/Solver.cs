@@ -56,7 +56,7 @@ namespace TEModel
                     P_X[0] = Nodes[0, j].AE / Nodes[0, j].AP;
                     Q_X[0] = Nodes[0, j].b / Nodes[0, j].AP;
 
-                    for (int i = 1; i < x_nodes_max; i++)
+                    for (int i = 1; i <= x_nodes_max; i++)
                     {
                         P_X[i] = Nodes[i, j].AE / (Nodes[i, j].AP - Nodes[i, j].AW * P_X[i - 1]);
                         Q_X[i] = (Nodes[i, j].b + Nodes[i, j].AN * Nodes[i, j + 1].T + Nodes[i, j].AS * Nodes[i, j - 1].T + Nodes[i, j].AW * Q_X[i - 1]) / (Nodes[i, j].AP - Nodes[i, j].AW * P_X[i - 1]);
@@ -83,7 +83,7 @@ namespace TEModel
                     P_Y[0] = Nodes[i, 0].AN / Nodes[i, 0].AP;
                     Q_Y[0] = Nodes[i, 0].b / Nodes[i, 0].AP;
 
-                    for (int j = 1; j < y_nodes_max; j++)
+                    for (int j = 1; j <= y_nodes_max; j++)
                     {
                         P_Y[j] = Nodes[i, j].AN / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
                         Q_Y[j] = (Nodes[i, j].b + Nodes[i, j].AE * Nodes[i + 1, j].T + Nodes[i, j].AW * Nodes[i - 1, j].T + Nodes[i, j].AS * Q_Y[j - 1]) / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
@@ -141,11 +141,11 @@ namespace TEModel
                 }
 
 
-                //phipast_to_phi(Nodes);
+                phipast_to_phi(Nodes);
 
-                //max_Err = (float)Calculate_Average_Error(Nodes);
+                float max_Err_Plot = (float)Calculate_Average_Error(Nodes);
 
-                Debug.WriteLine("Max Error:  " + max_Err + "        Residual:  " + Calculate_Residuals(Nodes) + " Iteration:  " + n_iter);
+                Debug.WriteLine("Max Error:  " + max_Err_Plot + "        Residual:  " + Calculate_Residuals(Nodes) + " Iteration:  " + n_iter);
 
                 //Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
                 //Boundary_C_Object.Apply_Boundary_Conditions_Solver();

@@ -17,7 +17,7 @@ namespace TEModel
             List<float> Y_Lines = new List<float>();
 
             int divisions_X = 30;
-            int divisions_Y = 60;
+            int divisions_Y = 30;
 
             // Generate lines;
 

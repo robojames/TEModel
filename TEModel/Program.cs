@@ -16,7 +16,8 @@ namespace TEModel
             List<float> X_Lines = new List<float>();
             List<float> Y_Lines = new List<float>();
 
-            int divisions_Per_Line = 100;
+            int divisions_X = 30;
+            int divisions_Y = 60;
 
             // Generate lines;
 
@@ -33,7 +34,7 @@ namespace TEModel
 
             Material_Initializer myMaterials = new Material_Initializer();
 
-            Mesh mesh = new Mesh(InitialX, InitialY, divisions_Per_Line, myGeom.Layer_List, myMaterials.Material_List);
+            Mesh mesh = new Mesh(InitialX, InitialY, divisions_X, divisions_Y, myGeom.Layer_List, myMaterials.Material_List);
 
             CSVHandler csv = new CSVHandler();
 
@@ -50,7 +51,7 @@ namespace TEModel
 
             Console.WriteLine("Finished...");
 
-            //Console.ReadLine();
+            Console.ReadLine();
 
         }
     }

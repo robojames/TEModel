@@ -56,7 +56,7 @@ namespace TEModel
                     P_X[0] = Nodes[0, j].AE / Nodes[0, j].AP;
                     Q_X[0] = Nodes[0, j].b / Nodes[0, j].AP;
 
-                    for (int i = 1; i < x_nodes_max + 1; i++)
+                    for (int i = 1; i < x_nodes_max; i++)
                     {
                         P_X[i] = Nodes[i, j].AE / (Nodes[i, j].AP - Nodes[i, j].AW * P_X[i - 1]);
                         Q_X[i] = (Nodes[i, j].b + Nodes[i, j].AN * Nodes[i, j + 1].T + Nodes[i, j].AS * Nodes[i, j - 1].T + Nodes[i, j].AW * Q_X[i - 1]) / (Nodes[i, j].AP - Nodes[i, j].AW * P_X[i - 1]);
@@ -65,17 +65,12 @@ namespace TEModel
 
                     Nodes[x_nodes_max, j].T = Q_X[x_nodes_max];
 
-                    for (int i = x_nodes_max - 1; i >= 0; --i)
+                    for (int i = x_nodes_max - 1; i >= 0; i--)
                     {
                         Nodes[i, j].T = P_X[i] * Nodes[i + 1, j].T + Q_X[i];
                     }
 
                 }
-
-                phipast_to_phi(Nodes);
-
-                Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
-                //Boundary_C_Object.Apply_Boundary_Conditions_Solver();
 
 
                 // Traveling in positive y-direction
@@ -88,7 +83,7 @@ namespace TEModel
                     P_Y[0] = Nodes[i, 0].AN / Nodes[i, 0].AP;
                     Q_Y[0] = Nodes[i, 0].b / Nodes[i, 0].AP;
 
-                    for (int j = 1; j < y_nodes_max + 1; j++)
+                    for (int j = 1; j < y_nodes_max; j++)
                     {
                         P_Y[j] = Nodes[i, j].AN / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
                         Q_Y[j] = (Nodes[i, j].b + Nodes[i, j].AE * Nodes[i + 1, j].T + Nodes[i, j].AW * Nodes[i - 1, j].T + Nodes[i, j].AS * Q_Y[j - 1]) / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
@@ -96,27 +91,68 @@ namespace TEModel
 
                     Nodes[i, y_nodes_max].T = Q_Y[y_nodes_max];
 
-                    for (int j = y_nodes_max - 1; j >= 0; --j)
+                    for (int j = y_nodes_max - 1; j >= 0; j--)
                     {
                         Nodes[i, j].T = P_Y[j] * Nodes[i, j + 1].T + Q_Y[j];
                     }
                 }
 
-                phipast_to_phi(Nodes);
+                // Traveling in negative x-direction
 
-                max_Err = (float)Calculate_Average_Error(Nodes);
+                for (int j = 1; j < y_nodes_max; j++)
+                {
+                    P_X[0] = Nodes[x_nodes_max, j].AW / Nodes[x_nodes_max, j].AP;
+                    Q_X[0] = Nodes[x_nodes_max, j].b / Nodes[x_nodes_max, j].AP;
 
-                Debug.WriteLine("Max Error:  " + max_Err + "        Residual:  " + Calculate_Residuals(Nodes));
+                    for (int i = 1; i <= x_nodes_max; i++)
+                    {
+                        P_X[i] = Nodes[x_nodes_max - i + 1, j].AW / (Nodes[x_nodes_max - i + 1, j].AP - Nodes[x_nodes_max - i + 1, j].AE * P_X[i - 1]);
+                        Q_X[i] = (Nodes[x_nodes_max - i + 1, j].b + Nodes[x_nodes_max - i + 1, j].AN * Nodes[x_nodes_max - i + 1, j + 1].T + Nodes[x_nodes_max - i + 1, j].AS * Nodes[x_nodes_max - i + 1, j - 1].T + Nodes[x_nodes_max - i + 1, j].AE * Q_X[i - 1]) / (Nodes[x_nodes_max - i + 1, j].AP - Nodes[x_nodes_max - i + 1, j].AE * P_X[i - 1]);
+                    }
 
 
-                Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
+                    Nodes[0, j].T = Q_X[x_nodes_max];
+
+                    for (int i = x_nodes_max - 1; i >= 1; i--)
+                    {
+                        Nodes[x_nodes_max - i + 1, j].T = P_X[i] * Nodes[x_nodes_max - i, j].T + Q_X[i];
+                    }
+
+                }
+
+                // Travel in negative y-direction
+                for (int i = 1; i < x_nodes_max; i++)
+                {
+                    P_Y[0] = Nodes[i, y_nodes_max].AS / Nodes[i, y_nodes_max].AP;
+                    Q_Y[0] = Nodes[i, y_nodes_max].b / Nodes[i, y_nodes_max].AP;
+
+                    for (int j = 1; j <= y_nodes_max; j++)
+                    {
+                        P_Y[j] = Nodes[i, y_nodes_max + 1 - j].AS / (Nodes[i, y_nodes_max + 1 - j].AP - Nodes[i, y_nodes_max + 1 - j].AN * P_Y[j - 1]);
+                        Q_Y[j] = (Nodes[i, y_nodes_max + 1 - j].b + Nodes[i, y_nodes_max + 1 - j].AE * Nodes[i + 1, y_nodes_max + 1 - j].T + Nodes[i, y_nodes_max + 1 - j].AW * Nodes[i - 1, y_nodes_max + 1 - j].T + Nodes[i, y_nodes_max + 1 - j].AN * Q_Y[j - 1]) / (Nodes[i, y_nodes_max + 1 - j].AP - Nodes[i, y_nodes_max + 1 - j].AN * P_Y[j - 1]);
+                    }
+
+                    Nodes[i, 1].T = Q_Y[y_nodes_max];
+
+                    for (int j = y_nodes_max - 1; j >= 1; j--)
+                    {
+                        Nodes[i, y_nodes_max + 1 - j].T = P_Y[j] * Nodes[i, y_nodes_max - j].T + Q_Y[j];
+                    }
+                }
+
+
+                //phipast_to_phi(Nodes);
+
+                //max_Err = (float)Calculate_Average_Error(Nodes);
+
+                Debug.WriteLine("Max Error:  " + max_Err + "        Residual:  " + Calculate_Residuals(Nodes) + " Iteration:  " + n_iter);
+
+                //Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
                 //Boundary_C_Object.Apply_Boundary_Conditions_Solver();
                  
                 n_iter++;
 
-                dT.Add((float)Calculate_Residuals(Nodes));
-
-                if (n_iter > 10000)
+                if (n_iter > 1500)
                     break;
 
             } // End While Loop 
@@ -197,10 +233,7 @@ namespace TEModel
                 {
                     Nodes[i, j].res = Nodes[i, j].AP * Nodes[i, j].T - (Nodes[i + 1, j].AE * Nodes[i + 1, j].T + Nodes[i - 1, j].AW * Nodes[i - 1, j].T + Nodes[i, j + 1].AN * Nodes[i, j + 1].T + Nodes[i, j - 1].AS * Nodes[i, j - 1].T + Nodes[i, j].b);
 
-                    Nodes[i, j].res *= Nodes[i, j].res; // Equivalent to Nodes[i,j].res^2
-
-                    Nodes[i, j].res = (float)Math.Sqrt(Nodes[i, j].res);
-
+                    
                     avg_Res += Nodes[i, j].res;
 
                 }

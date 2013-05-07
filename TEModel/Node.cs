@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace TEModel
 {
@@ -93,6 +94,24 @@ namespace TEModel
             this.AS = 0;
             this.AP0 = 0;
             
+        }
+
+        public void Validate_Node()
+        {
+            if (this.AP < 0 | this.AE < 0 | this.AW < 0 | this.AN < 0 | this.AS < 0)
+            {
+                Debug.WriteLine("Error with Node.");
+            }
+
+            if (this.delta_X <= 0 | this.delta_Y <= 0)
+            {
+                Debug.WriteLine("Error with CV Width or Height");
+            }
+
+            if (this.d_X_E <= 0 | this.d_X_W <= 0 | this.d_Y_N <= 0 | this.d_Y_S <= 0)
+            {
+                Debug.WriteLine("Error with DX or DY's at " + this.x_Position + "       " + this.y_Position);
+            }
         }
     }
 }

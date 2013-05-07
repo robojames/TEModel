@@ -25,7 +25,7 @@ namespace TEModel
         string material;
 
  
-        public Mesh(List<float> Initial_X, List<float> Initial_Y, int n_Divisions, List<Layer> Layer_List, List<Material> Material_List)
+        public Mesh(List<float> Initial_X, List<float> Initial_Y, int n_Divisions_X, int n_Divisions_Y, List<Layer> Layer_List, List<Material> Material_List)
         {
             this.Layer_List = Layer_List;
 
@@ -33,7 +33,7 @@ namespace TEModel
             MaterialList = Material_List;
 
             Console.WriteLine("Generating Mesh Lines...");
-            Generate_Lines(Initial_X, Initial_Y, n_Divisions);
+            Generate_Lines(Initial_X, Initial_Y, n_Divisions_X, n_Divisions_Y);
 
             Console.WriteLine("Calculating Coordinate Pairs...");
             Generate_Coordinate_Pairs();
@@ -47,14 +47,14 @@ namespace TEModel
             foreach (Node node in Node_Array)
             {
                 node.T = 300.0f;
-                node.T_Past = 300.0f;
+                node.T_Past = 0.0f;
             }
 
             Console.WriteLine("Marking Nodes for Spatially Variant Source Terms...");
             Mark_Nodes_For_Source_Terms();
 
             Console.WriteLine("Calculating and Setting Spatial Source Terms...");
-            Set_Source_Terms(4.0f);
+            Set_Source_Terms(2.0f);
 
             Console.WriteLine("Initializing Influence Coefficients...");
             Initialize_Influence_Coefficients(999999.0f);
@@ -62,47 +62,71 @@ namespace TEModel
             Console.WriteLine("Calculating Interfacial Conductivities...");
             Calculate_Interface_Conductivities();
 
+            Console.WriteLine("Validating Node Structure...");
+            foreach (Node node in Node_Array)
+            {
+                node.Validate_Node();
+            }
+
         }
 
         private void Set_Source_Terms(float I)
         {
+            int n_Applied = 0;
+
             float Electron_Constant_BiTE = 2.17f * (float)Math.Pow(10, -6);
             float Joule_Constant = 2.17f * (float)Math.Pow(10,-6);
             float Copper_Rho_E = 1.68f * (float)Math.Pow(10, -8);
-            float BiTe_Rho_E = (9.2f) * (float)Math.Pow(10, -4);
-            float alpha_BiTE = 0.378f * (float)Math.Pow(10, -4);
-            
+            float BiTe_Rho_E = (1.0f) * (float)Math.Pow(10, -5);
+
+
+            float alpha_BiTE = 2.0f * (float)Math.Pow(10, -4);
+            float J = I / (2.17f * (float)Math.Pow(10, -3));
 
             foreach (Node node in Node_Array)
             {
                 if (node.has_Electron_Pumping_Top == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    node.sp = (I / Electron_Constant_BiTE) * alpha_BiTE;
-                    //Debug.WriteLine("First:  " + node.sp);
+                    //node.sp = -alpha_BiTE * J;
+
+                    node.sp = J * alpha_BiTE;// *node.delta_X;
+                    n_Applied++;
                 }
 
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "Copper")
                 {
+
+                    node.sc = J * J * Copper_Rho_E; //* node.delta_X * node.delta_Y;
+                    //node.sc = J * J * Copper_Rho_E;
                     //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * Copper_Rho_E;
-                    node.sc = I * I * Copper_Rho_E;
+                    //node.sc = I * I * (Copper_Rho_E / (node.delta_Y * node.delta_X));
                     //node.sc = I * I * Copper_Rho_E * 0.0024f;
-                    //Debug.WriteLine("Second:  " + node.sc);
+                    n_Applied++;
                 }
 
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "BiTe")
                 {
-                    //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * BiTe_Rho_E;
-                    node.sc = I * I * BiTe_Rho_E;
+
+                    node.sc = J * J * BiTe_Rho_E;// *node.delta_X * node.delta_Y;
+                     //node.sc = (I / Joule_Constant) * (I / Joule_Constant) * BiTe_Rho_E;
+                    //node.sc = I * I * (BiTe_Rho_E / (node.delta_X * node.delta_Y));
                     //node.sc = I * I * BiTe_Rho_E * 7.15819f * (float)Math.Pow(10, -4);
-                    //Debug.WriteLine("Third:  " + node.sc);
+                    n_Applied++;
                 }
 
-                if (node.has_Electron_Pumping_Bottom == true)
+                if (node.has_Electron_Pumping_Bottom == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    node.sp = (I / Electron_Constant_BiTE) * alpha_BiTE;
-                    //Debug.WriteLine("Fourth:  " + node.sp);
+                    //node.sp = alpha_BiTE * J;
+
+                    node.sp = -J * alpha_BiTE;// *node.delta_X;
+                    n_Applied++;
                 }
+
+                //if (node.sp != 0 | node.sc != 0)
+                    //Debug.WriteLine(node.sp + "     " + node.sc);
             }
+
+            Console.WriteLine("Source Terms Applied to " + n_Applied + " nodes.");
         }
 
         private void Mark_Nodes_For_Source_Terms()
@@ -160,11 +184,15 @@ namespace TEModel
                     if (Node_Array[i,j].has_Electron_Pumping_Bottom == true)
                     {
                         NodeList_Bottom.Add(Node_Array[i, j - 1]);
+                        n_Nodes_Marked++;
+
                     }
 
                     if (Node_Array[i, j].has_Electron_Pumping_Top == true)
                     {
                         NodeList_Top.Add(Node_Array[i, j + 1]);
+                        n_Nodes_Marked++;
+
                     }
                 }
             }
@@ -544,16 +572,16 @@ namespace TEModel
             Console.WriteLine("Nodes Created:  " + ID);
         }
 
-        public void Generate_Lines(List<float> Initial_X, List<float> Initial_Y, int n_Divisions)
+        public void Generate_Lines(List<float> Initial_X, List<float> Initial_Y, int n_Divisions_X, int n_Divisions_Y)
         {
             List<float> Modified_X = new List<float>();
             List<float> Modified_Y = new List<float>();
 
             for (int i = 0; i < (Initial_X.Count - 1); i++)
             {
-                float dx = (Initial_X[i + 1] - Initial_X[i]) / ((float)n_Divisions);
+                float dx = (Initial_X[i + 1] - Initial_X[i]) / ((float)n_Divisions_X);
 
-                for (int j = 0; j < (n_Divisions); j++)
+                for (int j = 0; j < (n_Divisions_X); j++)
                 {
                     float x_point = Initial_X[i] + (dx * (float)j);
 
@@ -564,9 +592,9 @@ namespace TEModel
 
             for (int i = 0; i < (Initial_Y.Count - 1); i++)
             {
-                float dy = (Initial_Y[i + 1] - Initial_Y[i]) / ((float)n_Divisions);
+                float dy = (Initial_Y[i + 1] - Initial_Y[i]) / ((float)n_Divisions_Y);
 
-                for (int j = 0; j < (n_Divisions); j++)
+                for (int j = 0; j < (n_Divisions_Y); j++)
                 {
                     float y_point = Initial_Y[i] + (dy * (float)j);
 

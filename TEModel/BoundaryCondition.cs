@@ -23,17 +23,17 @@ namespace TEModel
 
             float dt = 999999.0f;
 
-            h_Top = 0.0f;
+            h_Top = 15.0f;
             h_Bottom = 0.0f;
             h_Left = 0.0f;
             h_Right = 0.0f;
 
-            T_Top = 280.0f;
+            T_Top = 0.0f;
             T_Bottom = 243.0f;
-            T_Right = 280.0f;
-            T_Left = 280.0f;
+            T_Right = 0.0f;
+            T_Left = 0.0f;
 
-            Tinf_Top = 0.0f;
+            Tinf_Top = 280.0f;
             Tinf_Bottom = 0.0f;
             Tinf_Right = 0.0f;
             Tinf_Left = 0.0f;
@@ -43,10 +43,10 @@ namespace TEModel
             q_Left = 0.0f;
             q_Right = 0.0f;
 
-            is_TBC_Top = 0;
+            is_TBC_Top = 1;
             is_TBC_Bottom = 0;
-            is_TBC_Right = 0;
-            is_TBC_Left = 0;
+            is_TBC_Right = 1;
+            is_TBC_Left = 1;
 
             Console.WriteLine("Setting Boundary Conditions...");
             Apply_Boundary_Conditions(dt);

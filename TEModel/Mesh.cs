@@ -54,7 +54,7 @@ namespace TEModel
             Mark_Nodes_For_Source_Terms();
 
             Console.WriteLine("Calculating and Setting Spatial Source Terms...");
-            Set_Source_Terms(2.0f);
+            Set_Source_Terms(2.2f);
 
             Console.WriteLine("Initializing Influence Coefficients...");
             Initialize_Influence_Coefficients(999999.0f);
@@ -74,7 +74,6 @@ namespace TEModel
         {
             int n_Applied = 0;
 
-
             float Copper_Rho_E = 1.68f * (float)Math.Pow(10, -8);
             float BiTe_Rho_E = (1.0f) * (float)Math.Pow(10, -5);
             float alpha_BiTE = 2.0f * (float)Math.Pow(10, -4);
@@ -83,9 +82,10 @@ namespace TEModel
             {
                 if (node.has_Electron_Pumping_Top == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    float J = I / node.delta_X;
+                    //float J = I / node.delta_X;
 
-                    node.sp = (-J * alpha_BiTE) / node.delta_Y;
+                    //node.sp = -500.0f * (J * alpha_BiTE) / node.delta_Y;
+                    node.sp = (-1.0f * alpha_BiTE * I) / (node.delta_X * node.delta_Y);
 
                     n_Applied++;
                 }
@@ -93,27 +93,29 @@ namespace TEModel
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "Copper")
                 {
 
-                    float J = I / node.delta_Y;
+                    //float J = I / node.delta_Y;
 
-                    node.sc = J * J * Copper_Rho_E;
+                    //node.sc = J * J * Copper_Rho_E;
+                    node.sc = I * I * Copper_Rho_E / (node.delta_X * node.delta_X);
                     
                     n_Applied++;
                 }
 
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "BiTe")
                 {
-                    float J = I / node.delta_X;
-
-                    node.sc = J * J * BiTe_Rho_E;
+                    //float J = I / node.delta_X;
+                    node.sc = I * I * BiTe_Rho_E / (node.delta_X * node.delta_X);
+                    //node.sc = J * J * BiTe_Rho_E;
                     
                     n_Applied++;
                 }
 
                 if (node.has_Electron_Pumping_Bottom == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    float J = I / node.delta_X;
+                    //float J = I / node.delta_X;
 
-                    node.sp = J * alpha_BiTE / node.delta_Y;
+                    //node.sp = 500.0f * J * alpha_BiTE / node.delta_Y;
+                    node.sp = (1.0f * alpha_BiTE * I) / (node.delta_X * node.delta_Y);
 
                     n_Applied++;
                 }
@@ -331,7 +333,6 @@ namespace TEModel
 
             //Console.WriteLine("Interfaces Adjusted:  " + n_Adjusted_Interfaces);
         }
-
 
 
         private void Calculate_dX_dY()

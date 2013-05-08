@@ -45,11 +45,12 @@ namespace TEModel
 
             while (max_Err > sol_Tol)
             {
-                // Traveling in positive x-direction
+                // Traveling in positive x-direction, VERIFIED
                 // A:  AP
                 // B:  AE
                 // C:  AW
                 // D:  b
+
 
                 for (int j = 1; j < y_nodes_max; j++)
                 {
@@ -73,7 +74,7 @@ namespace TEModel
                 }
 
 
-                // Traveling in positive y-direction
+                // Traveling in positive y-direction -- VERIFIED
                 // A: AP
                 // B: AN
                 // C: AS
@@ -82,7 +83,6 @@ namespace TEModel
                 {
                     P_Y[0] = Nodes[i, 0].AN / Nodes[i, 0].AP;
                     Q_Y[0] = Nodes[i, 0].b / Nodes[i, 0].AP;
-
                     for (int j = 1; j <= y_nodes_max; j++)
                     {
                         P_Y[j] = Nodes[i, j].AN / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
@@ -97,15 +97,17 @@ namespace TEModel
                     }
                 }
 
-                // Traveling in negative x-direction
+                //// Traveling in negative x-direction -- VERIFIED
 
                 for (int j = 1; j < y_nodes_max; j++)
                 {
+
                     P_X[0] = Nodes[x_nodes_max, j].AW / Nodes[x_nodes_max, j].AP;
                     Q_X[0] = Nodes[x_nodes_max, j].b / Nodes[x_nodes_max, j].AP;
 
                     for (int i = 1; i <= x_nodes_max; i++)
                     {
+
                         P_X[i] = Nodes[x_nodes_max - i + 1, j].AW / (Nodes[x_nodes_max - i + 1, j].AP - Nodes[x_nodes_max - i + 1, j].AE * P_X[i - 1]);
                         Q_X[i] = (Nodes[x_nodes_max - i + 1, j].b + Nodes[x_nodes_max - i + 1, j].AN * Nodes[x_nodes_max - i + 1, j + 1].T + Nodes[x_nodes_max - i + 1, j].AS * Nodes[x_nodes_max - i + 1, j - 1].T + Nodes[x_nodes_max - i + 1, j].AE * Q_X[i - 1]) / (Nodes[x_nodes_max - i + 1, j].AP - Nodes[x_nodes_max - i + 1, j].AE * P_X[i - 1]);
                     }
@@ -119,6 +121,7 @@ namespace TEModel
                     }
 
                 }
+
 
                 // Travel in negative y-direction
                 for (int i = 1; i < x_nodes_max; i++)
@@ -140,12 +143,11 @@ namespace TEModel
                     }
                 }
 
-
                 phipast_to_phi(Nodes);
 
                 float max_Err_Plot = (float)Calculate_Average_Error(Nodes);
 
-                Debug.WriteLine("Max Error:  " + max_Err_Plot + "        Residual:  " + Calculate_Residuals(Nodes) + " Iteration:  " + n_iter);
+                Console.WriteLine("Max Error:  " + max_Err_Plot + "        Residual:  " + Calculate_Residuals(Nodes) + " Iteration:  " + n_iter);
 
                 //Solver_Mesh_Object.Initialize_Influence_Coefficients(999999.0f);
                 //Boundary_C_Object.Apply_Boundary_Conditions_Solver();

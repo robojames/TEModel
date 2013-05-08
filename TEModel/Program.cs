@@ -13,11 +13,16 @@ namespace TEModel
             Console.WriteLine("                     Welcome to the TEModel Program                       ");
             Console.WriteLine(" ************************************************************************ ");
 
+
+            
+
+            Console.ReadLine();
+
             List<float> X_Lines = new List<float>();
             List<float> Y_Lines = new List<float>();
 
-            int divisions_X = 30;
-            int divisions_Y = 30;
+            int divisions_X = 50;
+            int divisions_Y = 70;
 
             // Generate lines;
 

@@ -10,10 +10,10 @@ namespace TEModel
     class CSVHandler
     {
 
-        string R_directory = @"C:\Users\James\Documents\GitHub\TEModel\Coordinatefile.csv";
-        string W_directory = @"C:\Users\James\Documents\GitHub\TEModel\Mesh.csv";
-        string WT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field.csv";
-        string WdT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field_Delta.csv";
+        string R_directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\Coordinatefile.csv";
+        string W_directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\Mesh.csv";
+        string WT_directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\T_Field.csv";
+        string WdT_directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\T_Field_Delta.csv";
 
 
         public List<float> x;
@@ -194,10 +194,9 @@ namespace TEModel
                 {
                     for (int j = 0; j < Nodes.GetLength(1); j++)
                     {
-                        if (i > 3 && j > 3)
-                        {
-                            dataWrite.WriteLine(Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + (Nodes[i, j].T - 273.0f).ToString());
-                        }
+                        
+                            dataWrite.WriteLine(Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + Nodes[i, j].T);
+                        
                     }
                 }
 

@@ -44,6 +44,7 @@
     <Compile Include="BoundaryCondition.cs" />
     <Compile Include="Coordinate.cs" />
     <Compile Include="CSVHandler.cs" />
+    <Compile Include="ElementGeometry.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="Material.cs" />
     <Compile Include="Material_Initializer.cs" />

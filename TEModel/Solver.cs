@@ -52,7 +52,7 @@ namespace TEModel
                 // D:  b
 
 
-                for (int j = 1; j < y_nodes_max; j++)
+                for (int j = 1; j <= y_nodes_max - 1; j++)
                 {
                     P_X[0] = Nodes[0, j].AE / Nodes[0, j].AP;
                     Q_X[0] = Nodes[0, j].b / Nodes[0, j].AP;
@@ -79,7 +79,7 @@ namespace TEModel
                 // B: AN
                 // C: AS
                 // D: b
-                for (int i = 1; i < x_nodes_max; i++)
+                for (int i = 1; i <= x_nodes_max - 1; i++)
                 {
                     P_Y[0] = Nodes[i, 0].AN / Nodes[i, 0].AP;
                     Q_Y[0] = Nodes[i, 0].b / Nodes[i, 0].AP;
@@ -97,51 +97,6 @@ namespace TEModel
                     }
                 }
 
-                //// Traveling in negative x-direction -- VERIFIED
-
-                for (int j = 1; j < y_nodes_max; j++)
-                {
-
-                    P_X[0] = Nodes[x_nodes_max, j].AW / Nodes[x_nodes_max, j].AP;
-                    Q_X[0] = Nodes[x_nodes_max, j].b / Nodes[x_nodes_max, j].AP;
-
-                    for (int i = 1; i <= x_nodes_max; i++)
-                    {
-
-                        P_X[i] = Nodes[x_nodes_max - i + 1, j].AW / (Nodes[x_nodes_max - i + 1, j].AP - Nodes[x_nodes_max - i + 1, j].AE * P_X[i - 1]);
-                        Q_X[i] = (Nodes[x_nodes_max - i + 1, j].b + Nodes[x_nodes_max - i + 1, j].AN * Nodes[x_nodes_max - i + 1, j + 1].T + Nodes[x_nodes_max - i + 1, j].AS * Nodes[x_nodes_max - i + 1, j - 1].T + Nodes[x_nodes_max - i + 1, j].AE * Q_X[i - 1]) / (Nodes[x_nodes_max - i + 1, j].AP - Nodes[x_nodes_max - i + 1, j].AE * P_X[i - 1]);
-                    }
-
-
-                    Nodes[0, j].T = Q_X[x_nodes_max];
-
-                    for (int i = x_nodes_max - 1; i >= 1; i--)
-                    {
-                        Nodes[x_nodes_max - i + 1, j].T = P_X[i] * Nodes[x_nodes_max - i, j].T + Q_X[i];
-                    }
-
-                }
-
-
-                // Travel in negative y-direction
-                for (int i = 1; i < x_nodes_max; i++)
-                {
-                    P_Y[0] = Nodes[i, y_nodes_max].AS / Nodes[i, y_nodes_max].AP;
-                    Q_Y[0] = Nodes[i, y_nodes_max].b / Nodes[i, y_nodes_max].AP;
-
-                    for (int j = 1; j <= y_nodes_max; j++)
-                    {
-                        P_Y[j] = Nodes[i, y_nodes_max + 1 - j].AS / (Nodes[i, y_nodes_max + 1 - j].AP - Nodes[i, y_nodes_max + 1 - j].AN * P_Y[j - 1]);
-                        Q_Y[j] = (Nodes[i, y_nodes_max + 1 - j].b + Nodes[i, y_nodes_max + 1 - j].AE * Nodes[i + 1, y_nodes_max + 1 - j].T + Nodes[i, y_nodes_max + 1 - j].AW * Nodes[i - 1, y_nodes_max + 1 - j].T + Nodes[i, y_nodes_max + 1 - j].AN * Q_Y[j - 1]) / (Nodes[i, y_nodes_max + 1 - j].AP - Nodes[i, y_nodes_max + 1 - j].AN * P_Y[j - 1]);
-                    }
-
-                    Nodes[i, 1].T = Q_Y[y_nodes_max];
-
-                    for (int j = y_nodes_max - 1; j >= 1; j--)
-                    {
-                        Nodes[i, y_nodes_max + 1 - j].T = P_Y[j] * Nodes[i, y_nodes_max - j].T + Q_Y[j];
-                    }
-                }
 
                 phipast_to_phi(Nodes);
 
@@ -154,7 +109,7 @@ namespace TEModel
                  
                 n_iter++;
 
-                if (n_iter > 1500)
+                if (n_iter > 5000)
                     break;
 
             } // End While Loop 
@@ -233,10 +188,13 @@ namespace TEModel
             {
                 for (int j = 1; j < Nodes.GetLength(1) - 1; j++)
                 {
-                    Nodes[i, j].res = Nodes[i, j].AP * Nodes[i, j].T - (Nodes[i + 1, j].AE * Nodes[i + 1, j].T + Nodes[i - 1, j].AW * Nodes[i - 1, j].T + Nodes[i, j + 1].AN * Nodes[i, j + 1].T + Nodes[i, j - 1].AS * Nodes[i, j - 1].T + Nodes[i, j].b);
+                    if (i > 5 && j > 5)
+                    {
+                        Nodes[i, j].res = Nodes[i, j].AP * Nodes[i, j].T - (Nodes[i + 1, j].AE * Nodes[i + 1, j].T + Nodes[i - 1, j].AW * Nodes[i - 1, j].T + Nodes[i, j + 1].AN * Nodes[i, j + 1].T + Nodes[i, j - 1].AS * Nodes[i, j - 1].T + Nodes[i, j].b);
 
-                    
-                    avg_Res += Nodes[i, j].res;
+
+                        avg_Res += Nodes[i, j].res;
+                    }
 
                 }
 

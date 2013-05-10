@@ -21,25 +21,33 @@ namespace TEModel
             List<float> X_Lines = new List<float>();
             List<float> Y_Lines = new List<float>();
 
-            int divisions_X = 50;
-            int divisions_Y = 70;
+            int divisions_X = 160;
+            int divisions_Y = 160;
 
             // Generate lines;
 
             List<float> Main_X_Coords = new List<float>();
             List<float> Main_Y_Coords = new List<float>();
 
-            TEMGeometry myGeom = new TEMGeometry();
+            //TEMGeometry myGeom_Element = new TEMGeometry();
+
+            ElementGeometry myGeom_Element = new ElementGeometry();
 
             List<float> InitialX = new List<float>();
             List<float> InitialY = new List<float>();
 
-            InitialX = myGeom.x_array.ToList();
-            InitialY = myGeom.y_array.ToList();
+            //InitialX = myGeom.x_array.ToList();
+            //InitialY = myGeom.y_array.ToList();
+
+            InitialX = myGeom_Element.xList;
+            InitialY = myGeom_Element.yList;
+
+            //InitialX = myGeom_Element.xList;
+            //InitialY = myGeom_Element.yList;
 
             Material_Initializer myMaterials = new Material_Initializer();
 
-            Mesh mesh = new Mesh(InitialX, InitialY, divisions_X, divisions_Y, myGeom.Layer_List, myMaterials.Material_List);
+            Mesh mesh = new Mesh(InitialX, InitialY, divisions_X, divisions_Y, myGeom_Element.LayerList, myMaterials.Material_List);
 
             CSVHandler csv = new CSVHandler();
 

@@ -54,7 +54,7 @@ namespace TEModel
             Mark_Nodes_For_Source_Terms();
 
             Console.WriteLine("Calculating and Setting Spatial Source Terms...");
-            Set_Source_Terms(2.2f);
+            Set_Source_Terms(4.0f);
 
             Console.WriteLine("Initializing Influence Coefficients...");
             Initialize_Influence_Coefficients(999999.0f);
@@ -82,10 +82,9 @@ namespace TEModel
             {
                 if (node.has_Electron_Pumping_Top == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    //float J = I / node.delta_X;
+                    float J = I / node.delta_X;
 
-                    //node.sp = -500.0f * (J * alpha_BiTE) / node.delta_Y;
-                    node.sp = (-1.0f * alpha_BiTE * I) / (node.delta_X * node.delta_Y);
+                    //node.sp = (-2.0f * alpha_BiTE * J) / node.delta_Y;
 
                     n_Applied++;
                 }
@@ -93,29 +92,27 @@ namespace TEModel
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "Copper")
                 {
 
-                    //float J = I / node.delta_Y;
+                    float J = I / node.delta_Y;
 
-                    //node.sc = J * J * Copper_Rho_E;
-                    node.sc = I * I * Copper_Rho_E / (node.delta_X * node.delta_X);
+                    //node.sc = (J * J * Copper_Rho_E);// / node.delta_X;
                     
                     n_Applied++;
                 }
 
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "BiTe")
                 {
-                    //float J = I / node.delta_X;
-                    node.sc = I * I * BiTe_Rho_E / (node.delta_X * node.delta_X);
-                    //node.sc = J * J * BiTe_Rho_E;
+                    float J = I / node.delta_X;
+                    
+                    node.sc = (J * J * BiTe_Rho_E);// / node.delta_X;
                     
                     n_Applied++;
                 }
 
                 if (node.has_Electron_Pumping_Bottom == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    //float J = I / node.delta_X;
+                    float J = I / node.delta_X;
 
-                    //node.sp = 500.0f * J * alpha_BiTE / node.delta_Y;
-                    node.sp = (1.0f * alpha_BiTE * I) / (node.delta_X * node.delta_Y);
+                    //node.sp = (2.0f * alpha_BiTE * J) / node.delta_Y;
 
                     n_Applied++;
                 }
@@ -171,7 +168,7 @@ namespace TEModel
                 }
             }
 
-            // This is the problem
+            
             List<Node> NodeList_Bottom = new List<Node>();
             List<Node> NodeList_Top = new List<Node>();
 

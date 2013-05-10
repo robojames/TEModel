@@ -23,17 +23,17 @@ namespace TEModel
 
             float dt = 999999.0f;
 
-            h_Top = 15.0f;
+            h_Top = 0.0f;
             h_Bottom = 0.0f;
             h_Left = 0.0f;
             h_Right = 0.0f;
 
-            T_Top = 0.0f;
-            T_Bottom = 243.0f;
+            T_Top = 300.0f;
+            T_Bottom = 230.0f;
             T_Right = 0.0f;
             T_Left = 0.0f;
 
-            Tinf_Top = 280.0f;
+            Tinf_Top = 0.0f;
             Tinf_Bottom = 0.0f;
             Tinf_Right = 0.0f;
             Tinf_Left = 0.0f;
@@ -43,7 +43,7 @@ namespace TEModel
             q_Left = 0.0f;
             q_Right = 0.0f;
 
-            is_TBC_Top = 1;
+            is_TBC_Top = 0;
             is_TBC_Bottom = 0;
             is_TBC_Right = 1;
             is_TBC_Left = 1;
@@ -115,7 +115,7 @@ namespace TEModel
 
 
                 Node_Array[max_X, j].AP = Node_Array[max_X, j].AP0 + Node_Array[max_X, j].AE + Node_Array[max_X, j].AW + Node_Array[max_X, j].AN + Node_Array[max_X, j].AS + h_Right * Node_Array[max_X, j].delta_Y - Node_Array[max_X, j].sp * Node_Array[max_X, j].delta_X * Node_Array[max_X, j].delta_Y * 0.5f * (float)is_TBC_Right + (1.0f * (1.0f - (float)is_TBC_Right));
-                Node_Array[max_X, j].b = T_Right + q_Right * Node_Array[max_X, j].delta_X + h_Right * Node_Array[max_X, j].delta_X * Tinf_Right + Node_Array[max_X, j].sc * Node_Array[max_X, j].delta_X * Node_Array[max_X, j].delta_Y * 0.5f * is_TBC_Right;
+                Node_Array[max_X, j].b = T_Right + q_Right * Node_Array[max_X, j].delta_X + h_Right * Node_Array[max_X, j].delta_Y * Tinf_Right + Node_Array[max_X, j].sc * Node_Array[max_X, j].delta_X * Node_Array[max_X, j].delta_Y * 0.5f * is_TBC_Right;
                 Node_Array[max_X, j].T = T_Right;
 
 

@@ -153,40 +153,6 @@ namespace TEModel
 
             }
 
-            //Int32 index_X = 0;
-            //float tol_X = 0.005f;
-            //while (index_X < x_u.Count - 1)
-            //{
-            //    if (Math.Abs((x_u[index_X] - x_u[index_X + 1])) < tol_X)
-            //    {
-            //        x_u.RemoveAt(index_X);
-            //        Debug.WriteLine("Removed Value!");
-            //    }
-            //    else
-            //    {
-            //        index_X++;
-            //    }
-            //}
-
-            ////for (int i = 0; i < x_u.Count - 1; i++)
-            ////{
-            ////    Debug.WriteLine((x_u[i] - x_u[i + 1]));
-            ////}
-
-            //Int32 index_Y = 0;
-            //float tol = 0.005f;
-            //while (index_Y < y_u.Count - 1)
-            //{
-            //    if (Math.Abs((y_u[index_Y] - y_u[index_Y + 1])) < tol)
-            //    {
-            //        y_u.RemoveAt(index_Y);
-            //        Debug.WriteLine("Removed Value!");
-            //    }
-            //    else
-            //    {
-            //        index_Y++;
-            //    }
-            //}
             float[] x = new float[x_u.Count()];
             float[] y = new float[y_u.Count()];
 
@@ -260,16 +226,6 @@ namespace TEModel
             this.x_array = xList.ToArray();
             this.y_array = yList.ToArray();
 
-
-            //foreach (float val in x_array)
-            //{
-            //    Debug.WriteLine(val);
-            //}
-
-            //foreach(float val in y_array)
-            //{
-            //    Debug.WriteLine(val);
-            //}
 
             Debug.WriteLine(this.x_array.Count());
             Debug.WriteLine(this.y_array.Count());

@@ -52,12 +52,12 @@ namespace TEModel
                 // D:  b
 
 
-                for (int j = 1; j <= y_nodes_max - 1; j++)
+                for (int j = 1; j < y_nodes_max; j++)
                 {
                     P_X[0] = Nodes[0, j].AE / Nodes[0, j].AP;
                     Q_X[0] = Nodes[0, j].b / Nodes[0, j].AP;
 
-                    for (int i = 1; i <= x_nodes_max; i++)
+                    for (int i = 1; i < x_nodes_max + 1; i++)
                     {
                         P_X[i] = Nodes[i, j].AE / (Nodes[i, j].AP - Nodes[i, j].AW * P_X[i - 1]);
                         Q_X[i] = (Nodes[i, j].b + Nodes[i, j].AN * Nodes[i, j + 1].T + Nodes[i, j].AS * Nodes[i, j - 1].T + Nodes[i, j].AW * Q_X[i - 1]) / (Nodes[i, j].AP - Nodes[i, j].AW * P_X[i - 1]);
@@ -66,7 +66,7 @@ namespace TEModel
 
                     Nodes[x_nodes_max, j].T = Q_X[x_nodes_max];
 
-                    for (int i = x_nodes_max - 1; i >= 0; i--)
+                    for (int i = x_nodes_max - 1; i >= 0; --i)
                     {
                         Nodes[i, j].T = P_X[i] * Nodes[i + 1, j].T + Q_X[i];
                     }
@@ -79,11 +79,11 @@ namespace TEModel
                 // B: AN
                 // C: AS
                 // D: b
-                for (int i = 1; i <= x_nodes_max - 1; i++)
+                for (int i = 1; i < x_nodes_max; i++)
                 {
                     P_Y[0] = Nodes[i, 0].AN / Nodes[i, 0].AP;
                     Q_Y[0] = Nodes[i, 0].b / Nodes[i, 0].AP;
-                    for (int j = 1; j <= y_nodes_max; j++)
+                    for (int j = 1; j < y_nodes_max + 1; j++)
                     {
                         P_Y[j] = Nodes[i, j].AN / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
                         Q_Y[j] = (Nodes[i, j].b + Nodes[i, j].AE * Nodes[i + 1, j].T + Nodes[i, j].AW * Nodes[i - 1, j].T + Nodes[i, j].AS * Q_Y[j - 1]) / (Nodes[i, j].AP - Nodes[i, j].AS * P_Y[j - 1]);
@@ -91,7 +91,7 @@ namespace TEModel
 
                     Nodes[i, y_nodes_max].T = Q_Y[y_nodes_max];
 
-                    for (int j = y_nodes_max - 1; j >= 0; j--)
+                    for (int j = y_nodes_max - 1; j >= 0; --j)
                     {
                         Nodes[i, j].T = P_Y[j] * Nodes[i, j + 1].T + Q_Y[j];
                     }
@@ -109,9 +109,26 @@ namespace TEModel
                  
                 n_iter++;
 
-                if (n_iter > 5000)
-                    break;
+                if (n_iter > 50000)
+                {
+                    float MidT = 0.0f;
 
+                    for (int i = 0; i < Nodes.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < Nodes.GetLength(1); j++)
+                        {
+                            if (j == Math.Round(Nodes.GetLength(1) / 2.0f) && i == Math.Round(Nodes.GetLength(0) / 2.0f))
+                            {
+                                Console.WriteLine(i + "     " + j);
+                                Console.WriteLine("X:  " + Nodes[i, j].x_Position + "        " + " Y: " + Nodes[i, j].y_Position);
+                                MidT = Nodes[i, j].T;
+                            }
+                        }
+                    }
+
+                    Console.WriteLine("Middle Temperature:  " + MidT);
+                    break;
+                }
             } // End While Loop 
 
         } // End Function

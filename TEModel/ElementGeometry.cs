@@ -29,7 +29,7 @@ namespace TEModel
 
             // Need to eliminate Nodes numbering requirement from Layer Class
             float x0 = 0.0f;
-            float y0 = 0.0013081f;
+            float y0 = 0.00132080f;
 
             float xf = 0.001397f;
             float yf = 0.0f;
@@ -64,6 +64,7 @@ namespace TEModel
             xList = X_sort.ToList();
             yList = Y_sort.ToList();
 
+            
         }
     }
 }

@@ -54,7 +54,7 @@ namespace TEModel
             Mark_Nodes_For_Source_Terms();
 
             Console.WriteLine("Calculating and Setting Spatial Source Terms...");
-            Set_Source_Terms(4.0f);
+            Set_Source_Terms(2.0f);
 
             Console.WriteLine("Initializing Influence Coefficients...");
             Initialize_Influence_Coefficients(999999.0f);
@@ -80,11 +80,13 @@ namespace TEModel
 
             foreach (Node node in Node_Array)
             {
+                
                 if (node.has_Electron_Pumping_Top == true && (node.Material == "BiTe" | node.Material == "Copper"))
                 {
-                    float J = I / node.delta_X;
-
-                    //node.sp = (-2.0f * alpha_BiTE * J) / node.delta_Y;
+                    //float J = I / node.delta_X;
+                    float Ac = 1.9516f * (float)Math.Pow(10, -6);
+                    float J = I / Ac;
+                    node.sp = (-4.0f * alpha_BiTE * J) / (node.delta_Y);
 
                     n_Applied++;
                 }
@@ -101,9 +103,10 @@ namespace TEModel
 
                 if (node.has_Joule_Heating == true && node.Node_Material.Material_Name == "BiTe")
                 {
-                    float J = I / node.delta_X;
-                    
-                    node.sc = (J * J * BiTe_Rho_E);// / node.delta_X;
+                    //float J = I / node.delta_X;
+                    float Ac = 1.9516f * (float)Math.Pow(10, -6);
+                    float J = I / Ac;
+                    //node.sc = (J * J * BiTe_Rho_E);// / node.delta_X;
                     
                     n_Applied++;
                 }
@@ -599,8 +602,8 @@ namespace TEModel
             Modified_X_Distinct = Modified_X.Distinct().ToList();
             Modified_Y_Distinct = Modified_Y.Distinct().ToList();
 
-            Console.WriteLine("Initial Node Count(X):  " + Initial_X.Count + "         Modified Node Count:  " + Modified_X.Count);
-            Console.WriteLine("Initial Node Count(X):  " + Initial_Y.Count + "         Modified Node Count:  " + Modified_Y.Count);
+            Console.WriteLine("Initial Line Count(X):  " + Initial_X.Count + "         Modified Line Count:  " + Modified_X.Count);
+            Console.WriteLine("Initial Line Count(Y):  " + Initial_Y.Count + "         Modified Line Count:  " + Modified_Y.Count);
         }
 
         public void Generate_Coordinate_Pairs()
@@ -649,7 +652,7 @@ namespace TEModel
                 }
             }
 
-            // Returns Coordinate List[][] to user
+            // Returns Coordinate List[,] to user
             return Coordinates;
 
         }

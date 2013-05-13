@@ -28,8 +28,8 @@ namespace TEModel
             h_Left = 0.0f;
             h_Right = 0.0f;
 
-            T_Top = 300.0f;
-            T_Bottom = 230.0f;
+            T_Top = 0.0f;
+            T_Bottom = 250.0f;
             T_Right = 0.0f;
             T_Left = 0.0f;
 
@@ -43,7 +43,7 @@ namespace TEModel
             q_Left = 0.0f;
             q_Right = 0.0f;
 
-            is_TBC_Top = 0;
+            is_TBC_Top = 1;
             is_TBC_Bottom = 0;
             is_TBC_Right = 1;
             is_TBC_Left = 1;

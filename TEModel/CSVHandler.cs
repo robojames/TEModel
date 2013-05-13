@@ -10,10 +10,11 @@ namespace TEModel
     class CSVHandler
     {
 
-        string R_directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\Coordinatefile.csv";
-        string W_directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\Mesh.csv";
-        string WT_directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\T_Field.csv";
-        string WdT_directory = @"C:\Users\James Armes\Documents\GitHub\TEModel\T_Field_Delta.csv";
+        string R_directory = @"C:\Users\James\Documents\GitHub\TEModel\Coordinatefile.csv";
+        string W_directory = @"C:\Users\James\Documents\GitHub\TEModel\Mesh.csv";
+        string WT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field.csv";
+        string WdT_directory = @"C:\Users\James\Documents\GitHub\TEModel\T_Field_Delta.csv";
+        string Write_Mid_T = @"C:\Users\James\Documents\GitHub\TEModel\T_Mid_T.csv";
 
 
         public List<float> x;
@@ -197,6 +198,39 @@ namespace TEModel
                         
                             dataWrite.WriteLine(Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + Nodes[i, j].T);
                         
+                    }
+                }
+
+                dataWrite.Close();
+            }
+            catch
+            {
+                Console.WriteLine("Error saving file, or writing was canceled ");
+            }
+        }
+
+        public void Write_Mid_Field(Node[,] Nodes)
+        {
+            try
+            {
+              
+                TextWriter dataWrite = new StreamWriter(Write_Mid_T);
+
+                List<string> Lines = new List<string>();
+
+                dataWrite.WriteLine("XPOS" + "," + "YPOS" + "," + "TEMP");
+
+                for (int i = 0; i < Nodes.GetLength(0); i++)
+                {
+                    for (int j = 0; j < Nodes.GetLength(1); j++)
+                    {
+                        int idx = (int)Math.Round(Nodes.GetLength(0) / 2.0);
+
+                        if (i == idx)
+                        {
+                            dataWrite.WriteLine(Nodes[i, j].x_Position + "," + Nodes[i, j].y_Position + "," + Nodes[i, j].T);
+                        }
+
                     }
                 }
 

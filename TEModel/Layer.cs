@@ -11,39 +11,39 @@ namespace TEModel
         /// <summary>
         /// Maximum x-direction [m]
         /// </summary>
-        public const float x_max = 0.040f;
+        public const double x_max = 0.040f;
 
         /// <summary>
         /// Maximum y-direction [m]
         /// </summary>
-        public const float y_max = 0.004864f;
+        public const double y_max = 0.004864f;
 
 
         // Holds value of Layer Area
         /// <summary>
         /// Layer area [m^2]
         /// </summary>
-        public float Layer_Area;
+        public double Layer_Area;
 
         /// <summary>
         /// Point on x-axis which indicates the upper left corner of the layer rectangle's distance from origin [m]
         /// </summary>
-        public float Layer_x0;
+        public double Layer_x0;
 
         /// <summary>
         /// Point on x-axis which indicates the lower right corner of the layer rectangle's distance from origin [m]
         /// </summary>
-        public float Layer_xf;
+        public double Layer_xf;
 
         /// <summary>
         /// Point on the y-axis which indicates the upper left corner of the layer rectangle's distance from origin [m]
         /// </summary>
-        public float Layer_y0;
+        public double Layer_y0;
 
         /// <summary>
         /// Point on the y-axis which indicates the lower right corner of the layer rectangle's distance from origin [m]
         /// </summary>
-        public float Layer_yf;
+        public double Layer_yf;
 
 
         /// <summary>
@@ -53,11 +53,11 @@ namespace TEModel
         /// </summary>
         public struct Rectangle
         {
-            public float x_0, y_0, x_f, y_f;
+            public double x_0, y_0, x_f, y_f;
 
             // Constructor for the Rectangle struct, requires initialization of both
             // coordinate pairs to define the rectangle.
-            public Rectangle(float px_0, float py_0, float px_f, float py_f)
+            public Rectangle(double px_0, double py_0, double px_f, double py_f)
             {
                 x_0 = px_0;
                 y_0 = py_0;
@@ -68,13 +68,13 @@ namespace TEModel
             // Area()
             //
             // Calculates the area of the rectangular area
-            public float Area()
+            public double Area()
             {
                 // Dx = Final x - Initial x
-                float dx = (x_f - x_0);
+                double dx = (x_f - x_0);
 
                 // Since y0 is always higher than yf, dy is calculated as y0-yf.
-                float dy = (y_0 - y_f);
+                double dy = (y_0 - y_f);
 
                 // Returns the area of the computational layer [m^2]
                 return (dx * dy);
@@ -126,7 +126,7 @@ namespace TEModel
         /// <param name="y_f">Y-coordinate, lower right corner</param>
         /// <param name="Mat_Name">Material for this layer</param>
         /// <param name="n_Nodes">Number of nodes for this layer</param>
-        public Layer(float x_0, float y_0, float x_f, float y_f, string Mat_Name, int n_Nodes)
+        public Layer(double x_0, double y_0, double x_f, double y_f, string Mat_Name)
         {
             
             Layer_Material = Mat_Name;

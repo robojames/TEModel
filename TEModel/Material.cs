@@ -9,13 +9,13 @@ namespace TEModel
     class Material
     {
 
-        public float k;
-        public float cp;
-        public float alpha;
-        public float rho;
+        public double k;
+        public double cp;
+        public double alpha;
+        public double rho;
         public string Material_Name;
 
-        public Material(string Material_Name, float k, float cp, float alpha, float rho)
+        public Material(string Material_Name, double k, double cp, double alpha, double rho)
         {
             this.Material_Name = Material_Name;
 

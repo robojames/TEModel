@@ -8,7 +8,7 @@ namespace TEModel
 {
     class Material_Initializer
     {
-        // A series of const floats which represent several material properties of materials utilized in the numeric model:
+        // A series of const doubles which represent several material properties of materials utilized in the numeric model:
         //
         // rho_XX = Density of Material XX [kg/m^3]
         // k_XX = Thermal Conductivity of Material XX [W/mK]
@@ -18,81 +18,84 @@ namespace TEModel
         /// <summary>
         /// Density of Copper [kg/m^3] at 20 C
         /// </summary>
-        const float rho_Copper = 8960.0f;
+        const double rho_Copper = 8960.0f;
 
         /// <summary>
         /// Thermal Conductivity of Copper [W / m K] at 20 C
         /// </summary>
-        const float k_Copper = 386.0f;
+        const double k_Copper = 386.0f;
 
         /// <summary>
         /// Heat Capacity of Copper [J/kg K] at 20 C
         /// </summary>
-        const float cp_Copper = 390.0f;
+        const double cp_Copper = 390.0f;
 
         /// <summary>
         /// Density of Ceramic Alumina used in TEM [kg/m^3] at 20 C
         /// </summary>
-        const float rho_Ceramic = 3750.0f;
+        const double rho_Ceramic = 3750.0f;
 
         /// <summary>
         /// Thermal Conductivity of Ceramic Alumina used in TEM [W / m K] at 20 C
         /// </summary>
-        const float k_Ceramic = 35.0f;
+        const double k_Ceramic = 35.0f;
         
         /// <summary>
         /// Heat Capacity of Ceramic Alumina used in TEM [J/kg K] at 20 C
         /// </summary>
-        const float cp_Ceramic = 870.0f;
+        const double cp_Ceramic = 870.0f;
 
         /// <summary>
         /// Density of Bismuth Telluride [kg/m^3] at 20 C
         /// </summary>
-        const float rho_BiTe = 7700.0f;
+        const double rho_BiTe = 7700.0f;
 
         /// <summary>
         /// Thermal Conductivity of Bismuth Telluride [W / m K] at 20 C
         /// </summary>
-        const float k_BiTe = 1.48f;
+        const double k_BiTe = 1.48f;
         
         /// <summary>
         /// Heat Capacity of Bismuth Telluride [J/kg K] at 20 C
         /// </summary>
-        const float cp_BiTe = 122.0f;
+        const double cp_BiTe = 122.0f;
         
         /// <summary>
         /// Density of glass [kg/m^3] at 20 C
         /// </summary>
-        const float rho_Glass = 2225.0f;
+        const double rho_Glass = 2225.0f;
         
         /// <summary>
         /// Thermal Conductivity of Glass [W / m K] at 20 C
         /// </summary>
-        const float k_Glass = 14.0f;
+        const double k_Glass = 14.0f;
 
         /// <summary>
         /// Heat Capacity of glass [J/kg K] at 20 C
         /// </summary>
-        const float cp_Glass = 835.0f;
+        const double cp_Glass = 835.0f;
 
         // FIX THESE VALUES HAHHHHHH
         
         /// <summary>
         /// Density of Air [kg/m^3] at 20 C
         /// </summary>
-        const float rho_Air = 1.204f;
+        const double rho_Air = 1.204f;
 
         /// <summary>
         /// Thermal Conductivity of Air [W / m K] at 20 C
         /// </summary>
-        const float k_Air = 0.02570f;
+        const double k_Air = 0.02570f;
 
         /// <summary>
         /// Heat Capacity of air [J/kg K] at 20 C
         /// </summary>
-        const float cp_Air = 1005.0f;
+        const double cp_Air = 1005.0f;
 
-        const float alpha_BiTE = 0.00025f; 
+        /// <summary>
+        /// Seebeck coefficient of bismuth telluride [V / K] at 20 C
+        /// </summary>
+        const double alpha_BiTE = 0.00025f; 
 
 
 
@@ -125,12 +128,12 @@ namespace TEModel
             // String array to hold the material names for visualization and error reporting
             string[] MatList_Name = new string[n_Materials] { "Copper", "Glass", "BiTe", "Ceramic" , "Air"};
 
-            // Float array to hold value of thermal conductivites
-            float[] k = new float[n_Materials] { k_Copper, k_Glass, k_BiTe, k_Ceramic, k_Air};
+            // double array to hold value of thermal conductivites
+            double[] k = new double[n_Materials] { k_Copper, k_Glass, k_BiTe, k_Ceramic, k_Air};
 
-            float[] rho = new float[n_Materials] { rho_Copper, rho_Glass, rho_BiTe, rho_Ceramic, rho_Air };
+            double[] rho = new double[n_Materials] { rho_Copper, rho_Glass, rho_BiTe, rho_Ceramic, rho_Air };
 
-            float[] cp = new float[n_Materials] { cp_Copper, cp_Glass, cp_BiTe, cp_Ceramic, cp_Air };
+            double[] cp = new double[n_Materials] { cp_Copper, cp_Glass, cp_BiTe, cp_Ceramic, cp_Air };
 
             // Iterates from 0 to n_Materials - 1 to create n_Materials number of Material objects.  
             for (int i = 0; i < n_Materials; i++ )

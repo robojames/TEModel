@@ -8,11 +8,11 @@ namespace TEModel
 {
     class Coordinate
     {
-        public float X;
-        public float Y;
+        public double X;
+        public double Y;
         public int ID;
 
-        public Coordinate(float X, float Y, int iD)
+        public Coordinate(double X, double Y, int iD)
         {
             ID = iD;
             this.X = X;

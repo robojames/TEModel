@@ -9,8 +9,8 @@ namespace TEModel
     class ElementGeometry
     {
         public List<Layer> LayerList;
-        public List<float> xList;
-        public List<float> yList;
+        public List<double> xList;
+        public List<double> yList;
 
         public ElementGeometry()
         {
@@ -28,16 +28,16 @@ namespace TEModel
             List<Layer> Geometry_Layer_List = new List<Layer>();
 
             // Need to eliminate Nodes numbering requirement from Layer Class
-            float x0 = 0.0f;
-            float y0 = 0.00132080f;
+            double x0 = 0.0f;
+            double y0 = 0.00132080f;
 
-            float xf = 0.001397f;
-            float yf = 0.0f;
+            double xf = 0.001397f;
+            double yf = 0.0f;
 
             string TE_Mat = "BiTe";
 
             // Node numbering requirement not needed for uniform mesh generation
-            Layer Element = new Layer(x0, y0, xf, yf, TE_Mat, 0);
+            Layer Element = new Layer(x0, y0, xf, yf, TE_Mat);
 
             Geometry_Layer_List.Add(Element);
 
@@ -46,8 +46,8 @@ namespace TEModel
 
         private void Generate_X_Y_Lines()
         {
-            List<float> x = new List<float>();
-            List<float> y = new List<float>();
+            List<double> x = new List<double>();
+            List<double> y = new List<double>();
 
             x.Add(LayerList[0].Layer_x0);
             x.Add(LayerList[0].Layer_xf);
@@ -55,8 +55,8 @@ namespace TEModel
             y.Add(LayerList[0].Layer_y0);
             y.Add(LayerList[0].Layer_yf);
 
-            float[] X_sort = x.ToArray();
-            float[] Y_sort = y.ToArray();
+            double[] X_sort = x.ToArray();
+            double[] Y_sort = y.ToArray();
 
             Array.Sort(X_sort);
             Array.Sort(Y_sort);

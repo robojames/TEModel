@@ -70,9 +70,9 @@ namespace TEModel
 
             double Copper_Rho_E = 1.68f * (double)Math.Pow(10, -8);
             double BiTe_Rho_E = (1.0f) * (double)Math.Pow(10, -5);
-            double alpha_BiTE = 2.0 * (double)Math.Pow(10, -4);//e-4//2.0f * (double)Math.Pow(10, -4);
+            double alpha_BiTE = 2.0 * (double)Math.Pow(10, -4) * 4;//e-4//2.0f * (double)Math.Pow(10, -4);
 
-            double scale = 3; // 8
+            
 
             foreach (Node node in Node_Array)
             {
@@ -81,8 +81,7 @@ namespace TEModel
                 {
                     double Ac = 1.9516f * (double)Math.Pow(10, -6);
                     double J = I / Ac;
-                    //node.sp = (-1.0 * scale * alpha_BiTE * J) / Ac; /// node.delta_Y;
-                    node.sp = (-1.0 * scale * alpha_BiTE * J) / (Ac);
+                    node.sp = (-1.0 * alpha_BiTE * J) / (Ac);
                     n_Applied++;
                 }
 
@@ -111,8 +110,7 @@ namespace TEModel
                     double Ac = 1.9516f * (double)Math.Pow(10, -6);
                     double J = I / Ac;
 
-                    node.sp = (1.0 * scale * alpha_BiTE * J) / (Ac);
-                    //node.sp = (1.0 * scale * alpha_BiTE * J) / Ac; /// node.delta_Y;
+                    node.sp = (1.0 * alpha_BiTE * J) / (Ac);
 
                     n_Applied++;
                 }

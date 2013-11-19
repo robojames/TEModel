@@ -27,8 +27,8 @@ namespace TEModel
 
              // Can be used to iterate over a current of 1-5 A to the TEM module
              // to construct steady-state temperature plots
-            //for (int i = 0; i <= Current_Profile.Count - 1; i++)
-            //{
+            for (int i = 0; i <= Current_Profile.Count - 1; i++)
+            {
 
                 // Time in seconds
                 double time = 55;
@@ -98,8 +98,8 @@ namespace TEModel
 
                 foreach (Node node in mesh.Node_Array)
                 {
-                    node.T = 273.0;
-                    node.T_Past = 273.0;
+                    node.T = 255.0;
+                    node.T_Past = 255.0;
                 }
                 
             // t < req_iter
@@ -150,7 +150,7 @@ namespace TEModel
 
                 csv.Write_Temperature_Versus_Time(Temperaturevst);
 
-            //}
+            }
             Console.WriteLine("Finished...");
 
             Console.ReadLine();
